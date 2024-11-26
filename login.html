@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - gathurUP - Getting Friends Togathur™</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="login_styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-form">
+            <div class="centered-logo">
+                <img src="gathurUP.png" alt="gatherUP_logo Logo" class="login-logo">
+            </div>
+            <div id="loginView">
+                <h2>Howdy, welcome back!</h2>
+                <input type="email" id="emailInput" placeholder="Email" required>
+                <input type="password" id="passwordInput" placeholder="Password" required>
+                <button id="emailLoginSubmitBtn" class="submit-btn">Login</button>
+                <p class="forgot-password">
+                    <button id="forgotPasswordBtn" class="link-button">Forgot Password?</button>
+                </p>
+                <div class="auth-separator">
+                    <div class="line"></div>
+                    <span>or</span>
+                    <div class="line"></div>
+                </div>
+            
+                    Don't have an account? <button id="showSignupBtn" class="link-button">Sign up</button>
+                </p>
+            </div>
+            <div id="signupView" style="display: none;">
+                <h2>Create Account</h2>
+                <input type="text" id="signupFirstNameInput" placeholder="First Name" required>
+                <input type="text" id="signupLastNameInput" placeholder="Last Name" required>
+                <input type="email" id="signupEmailInput" placeholder="Email" required>
+                <input type="password" id="signupPasswordInput" placeholder="Password" required>
+                <input type="password" id="signupConfirmPasswordInput" placeholder="Confirm Password" required>
+                <button id="emailSignupBtn" class="submit-btn">Sign Up</button>
+                <p class="signup-text">
+                    Already have an account? <button id="showLoginBtn" class="link-button">Login</button>
+                </p>
+            </div>
+            <div id="resetPasswordView" style="display: none;">
+                <h2>Reset Password</h2>
+                <p>Enter your email address and we'll send you a password reset link.</p>
+                <input type="email" id="resetEmailInput" placeholder="Email" required>
+                <button id="resetPasswordSubmitBtn" class="submit-btn">Send Reset Link</button>
+                <p>
+                    <button id="backToLoginBtn" class="link-button">Back to Login</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import { firebaseConfig } from './firebase-config.js';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+        import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        function toggleViews(showSignup) {
+            document.getElementById('loginView').style.display = showSignup ? 'none' : 'block';
+            document.getElementById('signupView').style.display = showSignup ? 'block' : 'none';
+        }
+
+        document.getElementById('showSignupBtn').addEventListener('click', () => toggleViews(true));
+        document.getElementById('showLoginBtn').addEventListener('click', () => toggleViews(false));
+
+        document.getElementById('emailLoginSubmitBtn').addEventListener('click', async () => {
+            const email = document.getElementById('emailInput').value;
+            const password = document.getElementById('passwordInput').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.href = 'app.html';
+            } catch (error) {
+                console.error("Error logging in with email:", error);
+                alert("Error logging in with email");
+            }
+        });
+
+        document.getElementById('emailSignupBtn').addEventListener('click', async () => {
+            const firstName = document.getElementById('signupFirstNameInput').value;
+            const lastName = document.getElementById('signupLastNameInput').value;
+            const email = document.getElementById('signupEmailInput').value;
+            const password = document.getElementById('signupPasswordInput').value;
+            const confirmPassword = document.getElementById('signupConfirmPasswordInput').value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords don't match");
+                return;
+            }
+
+            if (password.length < 6) {
+                alert("Password must be at least 6 characters");
+                return;
+            }
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Update Firebase Auth Profile
+                await updateProfile(user, {
+                    displayName: `${firstName} ${lastName}`
+                });
+
+                // Create user profile in Realtime Database
+                const userRef = ref(database, `users/${user.uid}/profile`);
+                await set(userRef, {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    subscription: 'free',
+                    createdAt: new Date().toISOString()
+                });
+
+                window.location.href = 'app.html';
+            } catch (error) {
+                console.error("Error signing up:", error);
+                alert(error.message || "Error signing up");
+            }
+        });
+
+        document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('resetPasswordView').style.display = 'block';
+            document.getElementById('signupView').style.display = 'none';
+        });
+
+        document.getElementById('backToLoginBtn').addEventListener('click', () => {
+            document.getElementById('loginView').style.display = 'block';
+            document.getElementById('resetPasswordView').style.display = 'none';
+            document.getElementById('signupView').style.display = 'none';
+        });
+
+        document.getElementById('resetPasswordSubmitBtn').addEventListener('click', async () => {
+            const email = document.getElementById('resetEmailInput').value;
+            try {
+                await sendPasswordResetEmail(auth, email);
+                alert('Password reset email sent! Check your inbox.');
+                document.getElementById('loginView').style.display = 'block';
+                document.getElementById('resetPasswordView').style.display = 'none';
+            } catch (error) {
+                console.error("Error sending reset email:", error);
+                alert(error.message || "Error sending reset email");
+            }
+        });
+    </script>
+</body>
+</html>

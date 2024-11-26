@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gathurUP - For Getting Friends Together Easily</title>
+    <link rel="icon" href="gathurup.ico" type="image/x-icon">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="gathurUP helps you get friends together easily by finding the best dates for everyone. No more endless text threads or confusing email chains.">
+    <meta name="keywords" content="gathurUP, event planning, group scheduling, find dates, get together, friends, social planning">
+    <meta name="author" content="Tiffanie and David Lewis">
+    <head>
+  <!-- Open Graph Title -->
+  <meta property="og:title" content="gathurUP - For Getting Friends Together Easily" />
+
+  <!-- Open Graph Description -->
+  <meta property="og:description" content="gathurUP helps you get friends together easily by finding the best dates for everyone. No more endless text threads or confusing email chains." />
+
+  <!-- Open Graph URL -->
+  <meta property="og:url" content="https://www.gathurup.com" />
+
+  <!-- Open Graph Image -->
+  <meta property="og:image" content="https://www.gathurup.com/gathurUP_teal_1200.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="1200" />
+
+  <!-- Open Graph Type -->
+  <meta property="og:type" content="website" />
+    <meta name="robots" content="index, follow">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .hero-section {
+            background-color: #81D8D0;
+            color: white;
+            text-align: center;
+            padding: 40px 20px; /* Further reduced padding */
+        }
+        .hero-section h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .hero-section p {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+        .hero-section .cta-button {
+            background-color: #ff4081;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+        .features-section, .testimonials-section, .signup-section {
+            padding: 20px 20px; /* Further reduced padding */
+            text-align: center;
+        }
+        .features-section h2, .testimonials-section h2, .signup-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+        .features-section p, .testimonials-section p, .signup-section p {
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+        .features-section .feature, .testimonials-section .testimonial {
+            margin-bottom: 10px; /* Further reduced margin */
+        }
+        .signup-section .signup-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .signup-section input {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .signup-section .signup-button {
+            background-color: #ff4081;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+        }
+        .gallery-section {
+            padding: 20px;
+            text-align: center;
+        }
+        /* Updated gallery styles */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            padding: 10px;
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+        .gallery-item {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+        .gallery-item img:hover {
+            transform: scale(1.05);
+        }
+        .gallery-caption {
+            margin-top: 10px;
+            font-size: 1.1em;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 1000;
+        }
+        /* Updated modal styles */
+        .modal-content {
+            position: relative;
+            margin: auto;
+            padding-top: 20px;
+            width: 95%;
+            max-width: 900px;
+        }
+        .modal-image {
+            width: 100%;
+            height: auto;
+        }
+        .close {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            z-index: 1001;
+        }
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 20px;
+            margin-top: -50px;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+            -webkit-user-select: none;
+            background-color: rgba(0, 0, 0, 0.5);
+            transform: translateY(-50%);
+            height: 60px;
+            display: flex;
+            align-items: center;
+        }
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+        .prev:hover, .next:hover {
+            background-color: rgba(0,0,0,0.8);
+        }
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 100%;
+                padding-top: 10px;
+            }
+            .prev, .next {
+                padding: 15px;
+                height: 50px;
+            }
+        }
+        /* Logo size adjustments */
+        .logo-container img {
+            max-width: 300px; /* Default size for desktop */
+            height: auto;
+        }
+
+        @media (max-width: 768px) {
+            .logo-container img {
+                max-width: 200px; /* Smaller size for mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-section">
+        <p>Already have an account? <a href="login.html">Log in here</a></p>
+    </div>
+    <div class="hero-section">
+        <div class="logo-container">
+            <img src="gathurUP.png" alt="gathurUP Logo">
+        </div>
+        <button class="cta-button" onclick="window.location.href='login.html'">Sign Up Now</button>
+    </div>
+    <div class="features-section">
+        <h1>Getting Friends Together Easily&trade;</h1>
+        <p>gathurUP helps you get friends together easily by finding the best dates for everyone. No more endless text threads or confusing email chains.</p>
+        <h2>Features</h2>
+        <div class="feature">
+            <h3>Easy Date Selection</h3>
+            <p>Quickly find the best dates that work for everyone in your group.</p>
+        </div>
+        <div class="feature">
+            <h3>Stop the Chaos</h3>
+            <p>No more crazy text threads and email chains looking for the best dates.</p>
+        </div>
+        <div class="feature">
+            <h3>It's FREE</h3>
+            <p>No Ads. No tricks. Use the program all you want and save your money for the fun.</p>
+        </div>
+    </div>
+
+    <div class="gallery-section">
+        <h2>See How It Works</h2>
+        <div class="gallery">
+            <div class="gallery-item" onclick="openModal();currentSlide(1)">
+                <img src="event_creation.png" alt="Event Creation">
+                <p class="gallery-caption">Create your event and offer possible dates in just a few clicks</p>
+            </div>
+            <div class="gallery-item" onclick="openModal();currentSlide(2)">
+                <img src="voting_shot.png" alt="Vote on Dates">
+                <p class="gallery-caption">Your friends submit which dates work best for them.</p>
+            </div>
+            <div class="gallery-item" onclick="openModal();currentSlide(3)">
+                <img src="event_report.png" alt="Event Report">
+                <p class="gallery-caption">Get a clear overview of the best dates for everyone</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="imageModal" class="modal">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <div class="modal-content">
+            <img class="modal-image" id="modalImage">
+            <a class="prev" onclick="changeSlide(-1)">&#10094;</a>
+            <a class="next" onclick="changeSlide(1)">&#10095;</a>
+        </div>
+    </div>
+
+    <script>
+        let slideIndex = 1;
+        const images = ["event_creation.png", "voting_shot.png", "event_report.png"];
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        function openModal() {
+            document.getElementById("imageModal").style.display = "block";
+            showSlide(slideIndex);
+        }
+        
+        function closeModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+        
+        function changeSlide(n) {
+            showSlide(slideIndex += n);
+        }
+        
+        function currentSlide(n) {
+            showSlide(slideIndex = n);
+        }
+        
+        function showSlide(n) {
+            if (n > images.length) slideIndex = 1;
+            if (n < 1) slideIndex = images.length;
+            document.getElementById("modalImage").src = images[slideIndex-1];
+        }
+
+        // Add touch support
+        document.getElementById("imageModal").addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        });
+
+        document.getElementById("imageModal").addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        });
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const swipeDistance = touchEndX - touchStartX;
+            
+            if (Math.abs(swipeDistance) > swipeThreshold) {
+                if (swipeDistance > 0) {
+                    changeSlide(-1); // Swipe right, go to previous
+                } else {
+                    changeSlide(1);  // Swipe left, go to next
+                }
+            }
+        }
+
+        // Close modal when clicking outside the image
+        document.getElementById("imageModal").addEventListener('click', e => {
+            if (e.target.classList.contains('modal')) {
+                closeModal();
+            }
+        });
+    </script>
+
+    <div class="testimonials-section">
+        <h2>What Our Users Say</h2>
+        <div class="testimonial">
+            <p>"gathurUP has been a game-changer for planning our group outings." - Tiffanie</p>
+        </div>
+        <div class="testimonial">
+            <p>"gathurUP made finding the best weekend so much easier!" - Audrey</p>
+        </div>
+        <div class="testimonial">
+            <p>"I love how simple gathurUP is to find dates that work for everyone." - Emily</p>
+        </div>
+        <div class="testimonial">
+            <p>"No more spreadsheets! gathurUP makes it easy to find trip dates. My friends and I LOVE IT!" - Frannie</p>
+        </div>
+        <div class="testimonial">
+            <p>"I love how my friends don't even need an account to vote on the dates." - Mindy</p>
+        </div>
+        <div class="testimonial">
+            <p>"We easily found our best book club night without all the back and forth." - Meg</p>
+        </div>
+        <div class="testimonial">
+            <p>"I've tried apps like Doodle, but this is super simple, FREE, and no ads!" - Rachel</p>
+        </div>
+    </div>
+    <div class="signup-section">
+        <h2>Sign Up Now for FREE</h2>
+        <p>Join gathurUP today and start planning your next "get togathur" with ease.</p>
+        <p>See what we did there?</p>
+        <div class="signup-form">
+            <button class="signup-button" onclick="window.location.href='login.html'">Sign Up</button>
+        </div>
+        <p>Already have an account? <a href="login.html">Log in here</a></p>
+    </div>
+</body>
+</html>

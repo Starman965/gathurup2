@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gathurUP - Date Confirmation</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="styles_event.css">
+    <style>
+        .logo-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="confirmation-message">
+        <div class="logo-container">
+            <img src="gathurUP.png" alt="gatherUP Logo">
+        </div>
+        <h2>Thank you for submitting your dates!</h2>
+        <p><a id="updatePreferencesLink">Update Your Preferences Here</a></p>
+        <h2>Do you organize events with friends?</h2>
+        <p><a href="index.html">Get your FREE gathurUP Account Today!</a></p>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('event');
+            const userId = urlParams.get('user');
+            const name = urlParams.get('name');
+            const updateLink = document.getElementById('updatePreferencesLink');
+            updateLink.href = `event.html?event=${eventId}&user=${userId}&name=${name}`;
+        });
+    </script>
+</body>
+</html>

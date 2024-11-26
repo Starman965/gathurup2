@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>gatherUP - Getting Friends Together Easily™</title>
+ <link rel="icon" href="gathurup.ico" type="image/x-icon">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="gathurUP helps you get friends together easily by finding the best dates for everyone. No more endless text threads or confusing email chains.">
+    <meta name="keywords" content="gathurUP, event planning, group scheduling, find dates, get together, friends, social planning">
+    <meta name="author" content="Tiffanie and David Lewis">
+    <link rel="stylesheet" href="styles.css">
+    <script type="module" src="app.js"></script>
+</head>
+<body>
+    
+
+    <!-- Main App Container -->
+    <div id="mainContainer" style="display: none;">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <img src="gathurUP.png" alt="gatherUP Logo" />
+                    <div class="logo-tagline">Getting Friends Together Easily™</div>
+                </div>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-profile-header">
+                    <div class="user-name-container">
+                        <div class="user-greeting">Howdy,</div>
+                        <span id="userName"></span>
+                        <div id="premiumBadge" class="premium-badge">Premium Member</div>
+                    </div>
+                    <button class="settings-button" data-tab="profile">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                    <button class="tab-button active" data-tab="welcome">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path>
+                    </svg>
+                    Welcome
+                </button>
+                <button class="tab-button " data-tab="createEvent">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                    Create Event
+                </button>
+                <button class="tab-button" data-tab="events">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    Events
+                </button>
+                <button class="tab-button" data-tab="tribes">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    People and Groups
+                </button>
+                <button class="tab-button" data-tab="instructions">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 16v-4"/>
+                        <path d="M12 8h.01"/>
+                    </svg>
+                    Instructions
+                </button>
+            </nav>
+            
+            <div class="quote-container">
+                <blockquote>
+                    "Failing to plan is planning to fail."
+                    <footer>— Benjamin Franklin</footer>
+                </blockquote>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+                        <div id="welcomeView" class="tab-content active">
+                <div class="content-header">
+                    <h1>Welcome to gathurUP! 🎉</h1>
+                </div>
+                
+                <div class="content-card welcome-card">
+                    <div class="welcome-section">
+                        <h2>Howdy, Beta Tester! 👋</h2>
+                        <p>We're thrilled to have you as one of our founding users! You're now part of something special - helping us shape the future of how friends get together. To say "Thank You" we made you a Premium Member.</table></p>
+                        
+                        <div class="welcome-feature">
+                            <h3>What's gathurUP?</h3>
+                            <p>Simply put, we're here to solve that age-old problem: "When can everyone get together?" No more endless text threads, confusing email chains, or frustrating back-and-forth. Just easy, clear date planning for your group activities.</p>
+                        </div>
+            
+                        <div class="welcome-feature">
+                            <h3>Beta Program Details 🚀</h3>
+                            <p>As an unofficial beta tester, keep in mind you're using gathurUP in its early stages. We have big plans for the future, but right now we're focused on perfecting our core feature: helping friends find the ideal date(s) to get together. In the future we plan to add destination, venue, and activity collaboration. </p>
+                            <p>We'd love to hear what you want next.</p>
+                            
+                            <div class="beta-notes">
+                                <p><strong>Please Note:</strong></p>
+                                <ul>
+                                    <li>Best viewed on iPad or desktop but mobile is also supported</li>
+                                    <li>Yes, you can let your friends know about using the app. Just remind them it's in Beta</li>
+                                    <li>Send feedback and bug reports to: <a href="mailto:demandgendave@gmail.com">demandgendave@gmail.com</a></li>
+                                    <li>Your feedback shapes our future features so don't be shy!</li>
+                                </ul>
+                            </div>
+                        </div>
+            
+                        <div class="welcome-feature">
+                            <h3>Ready to Get Started? 🎯</h3>
+                            <p>1. If you're on mobile, there's a little menu button in the lower right</p>
+                            <p>2. Head over to the <strong>Instructions</strong> page for a quick tour</p>
+                            <p>3. Add your friends in the <strong>People and Groups</strong> section</p>
+                            <p>4. Create your first event and watch the magic happen!</p>
+                        </div>
+            
+                        <div class="welcome-cta">
+                            <p>Thanks for being part of our journey! Let's make getting together easier for everyone. 🌟</p>
+                            <p>Your Friends,</p>
+                            <p>Tiffanie and David Lewis</p>
+                            <button onclick="switchTab('instructions')" class="primary-button">
+                                Start by Reading the Instructions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Create Event View -->
+            <div id="createEventView" class="tab-content">
+                <div class="content-header">
+                    <h1>Create/Edit Event</h1>
+                </div>
+                
+                <div class="content-card">
+                    <form id="eventForm">
+                        <div class="form-group">
+                            <label for="tribeSelect">Select Group</label>
+                            <select id="tribeSelect" required>
+                                <option value="">Choose a group...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="eventTitle">Event Title</label>
+                            <input type="text" id="eventTitle" required placeholder="Enter event title">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="eventDescription">Description</label>
+                            <textarea id="eventDescription" placeholder="Enter event description"></textarea>
+                        </div>
+
+                        <!-- Collapsible Sections -->
+                        <div class="section-card">
+                            <button type="button" class="collapsible">Dates</button>
+                            <div class="content">
+                                <div class="event-type">
+                                    <h3>Find Your Ideal Dates</h3>
+                                    <p class="section-tip">Tip: Choose Specific Date to find the best single date to meet up. Use Date Range for offering ranges to choose from for a multi-day event. Use Day of the Week for finding a consistent day, like Mon - Sun, to meet weekly.</p>
+                                    <label class="radio-label">
+                                        <input type="radio" name="eventType" value="specific" checked>
+                                        Specific Date
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="eventType" value="range">
+                                        Date Range
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="eventType" value="dayOfWeek">
+                                        Day of Week
+                                    </label>
+                                </div>
+
+                                <div class="date-input">
+                                    <!-- Specific Date -->
+                                    <div id="specificDateSection" class="date-field specific-date">
+                                        <div class="date-field-row">
+                                            <div>
+                                                <label for="specificDateInput">Date</label>
+                                                <input type="date" id="specificDateInput">
+                                            </div>
+                                            <button type="button" id="addSpecificDateBtn" onclick="addDate()">Add Date</button>
+                                        </div>
+                                    </div>
+                                
+                                    <!-- Date Range -->
+                                    <div id="rangeDateSection" class="date-field range-date" style="display: none;">
+                                        <div class="range-inputs">
+                                            <div class="date-field-row">
+                                                <div>
+                                                    <label for="startDateInput">Start Date</label>
+                                                    <input type="date" id="startDateInput">
+                                                </div>
+                                                <div>
+                                                    <label for="endDateInput">End Date</label>
+                                                    <input type="date" id="endDateInput">
+                                                </div>
+                                                <button type="button" id="addDateBtn" onclick="addDate()">Add Date Range</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                
+                                    <!-- Day of Week -->
+                                    <div id="dayOfWeekSection" class="date-field" style="display: none;">
+                                        <div class="days-of-week-container">
+                                            <div class="days-of-week-checkboxes">
+                                                <label><input type="checkbox" name="daysOfWeek" value="Monday"> Monday</label>
+                                                <label><input type="checkbox" name="daysOfWeek" value="Tuesday"> Tuesday</label>
+                                                <label><input type="checkbox" name="daysOfWeek" value="Wednesday"> Wednesday</label>
+                                                <label><input type="checkbox" name="daysOfWeek" value="Thursday"> Thursday</label>
+                                                <label><input type="checkbox" name="daysOfWeek" value="Friday"> Friday</label>
+                                                <label><input type="checkbox" name="daysOfWeek" value="Saturday"> Saturday</label>
+                                                <label><input type="checkbox" name="daysOfWeek" value="Sunday"> Sunday</label>
+                                            </div>
+                                            <button type="button" id="addDaysBtn" onclick="addDaysOfWeek()">Add Days</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div id="datesList" class="dates-list"></div>
+                            </div>
+                        </div>
+
+                        <div class="section-card">
+                            <button type="button" class="collapsible">Location</button>
+                            <div class="content">
+                                <h3>Find Your Ideal Location</h3>
+                                <p class="section-tip">Tip: Use Canva or ChatGPT to make location images. They should be 400px wide by 150px tall.</p>
+                                
+                                <!-- Add Location Form -->
+                                <div class="form-group">
+                                    <label for="locationName">Location Name</label>
+                                    <input type="text" id="locationName" placeholder="Enter location name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="locationDescription">Location Description</label>
+                                    <textarea id="locationDescription" placeholder="Enter location description"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="locationImage">Location Image</label>
+                                    <input type="file" id="locationImage" accept=".jpg, .jpeg, .png, .svg">
+                                    <small><em>Accepted file types: jpg, jpeg, png, svg. Images should be: 400 W x 150 T pixels.</em></small>
+                                </div>
+                                <button type="button" class="primary-button" onclick="addLocation()" id="addLocationBtn">Add Location</button>
+                                <!-- Current Locations List -->
+                                <div id="locationList" class="location-list">
+                                    <!-- This will be populated dynamically by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="section-card">
+                            <button type="button" class="collapsible">Budget</button>
+                            <div class="content">
+                                <p>Placeholder content for Budget.</p>
+                            </div>
+                        </div>
+
+                        <div class="section-card">
+                            <button type="button" class="collapsible">Hotel</button>
+                            <div class="content">
+                                <p>Placeholder content for Hotel.</p>
+                            </div>
+                        </div>
+
+                        <div class="section-card">
+                            <button type="button" class="collapsible">Activities</button>
+                            <div class="content">
+                                <p>Placeholder content for Activities.</p>
+                            </div>
+                        </div>
+
+                        <div class="section-card">
+                            <button type="button" class="collapsible">Packing</button>
+                            <div class="content">
+                                <p>Placeholder content for Packing.</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="anonymousResponses">
+                                Make Responses Anonymous
+                            </label>
+                        </div>
+
+                        <div class="submit-container">
+                            <button type="submit" class="primary-button">Create Event</button>
+                        </div>
+                    </form>
+
+                    <div id="shareLink" style="display: none;">
+                        <h3>Share this Event</h3>
+                        <div class="event-link-container">
+                            <input type="text" id="shareLinkInput" readonly>
+                            <button onclick="copyEventLink()" class="copy-button">Copy Link</button>
+                            <button onclick="openEventLink()" class="go-button">Open</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Events View -->
+            <div id="eventsView" class="tab-content">
+                <div class="content-header">
+                    <h1>Events</h1>
+                </div>
+                
+                <div class="events-list-container">
+                    <div class="events-list">
+                        <div class="events-table-header">
+                            <div class="event-col">Event</div>
+                            <div class="group-col">Group</div>
+                            <div class="actions-col">Actions</div>
+                        </div>
+                        <div id="eventsList" class="events-rows"></div>
+                    </div>
+                </div>
+            </div>
+
+<!-- Replace the tribes view content -->
+<div id="tribesView" class="tab-content">
+    <div class="content-header">
+        <h1>People and Groups</h1>
+        <div class="section-tabs">
+            <button class="section-tab active" data-section="people">People</button>
+            <button class="section-tab" data-section="groups">Groups</button>
+        </div>
+    </div>
+    
+    <div class="section-content active" id="peopleSection">
+    <div class="section-container">
+        <h2>People</h2>
+        <p class="section-tip">Tip: Add yourself first, then add each of your friends you plan to invite to various gatherings.</p>
+        <form id="personForm" class="add-person-form">
+            <input type="text" id="personName" placeholder="Enter full name" required maxlength="50">
+            <button type="submit" class="primary-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+            </button>
+        </form>
+        <div id="peopleList" class="list-container"></div>
+    </div>
+</div>
+
+    <div class="section-content" id="groupsSection">
+        <div class="section-container">
+            <div id="tribesList" class="list-container"></div>
+            
+            <h2 class="mt-24">Create New Group</h2>
+            <form id="tribeForm" class="add-form">
+                <div class="form-group">
+                    <input type="text" id="tribeName" placeholder="Enter group name" required>
+                </div>
+                
+                <div class="member-selection">
+                    <h3>Select Group Members</h3>
+                    <div class="member-selection-header">
+                        <button type="button" id="selectAllMembers" class="secondary-button">Select All</button>
+                    </div>
+                    <div id="memberCheckboxes" class="checkbox-container"></div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" id="tribeFormSubmit" class="primary-button">Create Group</button>
+                    <button type="reset" class="secondary-button">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Instructions View -->
+<div id="instructionsView" class="tab-content">
+    <div class="content-header">
+        <h1>Instructions</h1>
+    </div>
+    <div class="content-card">
+        <h2>Welcome to gathurUP!</h2>
+        <div class="instruction-sections">
+            <div class="instruction-section">
+                <h3>Step 1: Add People</h3>
+                <p>Start in the <strong>People and Groups</strong> tab. Add everyone you might want to invite to your events by entering their full names. These could be friends, family, colleagues - anyone you plan activities with.</p>
+            </div>
+
+            <div class="instruction-section">
+                <h3>Step 2: Create Groups</h3>
+                <p>Still in <strong>People and Groups</strong>, switch to the Groups section to organize your people into different groups. Each group can have its own purpose - maybe one for family gatherings, another for game nights, or weekend trips.</p>
+            </div>
+
+            <div class="instruction-section">
+                <h3>Step 3: Create Events</h3>
+                <p>Use the <strong>Create Event</strong> tab to set up your gathering. Choose from:</p>
+                <ul></ul>
+                    <li><strong>Specific Date:</strong> Perfect for one-day events like dinners or meetings</li>
+                    <li><strong>Date Range:</strong> Ideal for planning trips or multi-day events</li>
+                    <li><strong>Day of Week:</strong> Great for recurring events like weekly game nights</li>
+                </ul>
+            </div>
+
+            <div class="instruction-section">
+                <h3>Step 4: Share & Track</h3>
+                <p>After creating an event:</p>
+                <ul>
+                    <li>Copy and share the event link with your group</li>
+                    <li>Track responses in the Events tab</li>
+                    <li>See who's available and when</li>
+                    <li>Choose the date that works best for everyone</li>
+                </ul>
+            </div>
+
+            <div class="instruction-section">
+                <h3>Frequently Asked Questions</h3>
+                
+                <div class="faq-item">
+                    <h4>Q: Do my friends need accounts to respond?</h4>
+                    <p>A: No! They just need the event link you share with them.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: Can I edit an event after creating it?</h4>
+                    <p>A: Yes, you can edit event details, add/remove dates, and update group members at any time.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: What's the difference between Specific Date and Date Range?</h4>
+                    <p>A: Specific Date is for single-day events (like dinner), while Date Range lets people indicate availability across multiple days (like weekend trips).</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: Can I use the same group for different events?</h4>
+                    <p>A: Yes! Create a group once and use it for as many events as you like.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: What does "Anonymous Responses" mean?</h4>
+                    <p>A: When enabled, people can't see who voted for which dates - only the anonymous responses are shown.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Q: Can I delete people or groups?</h4>
+                    <p>A: Yes, you can remove individuals from your people list or delete entire groups. This won't affect past events.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Profile View -->
+<div id="profileView" class="tab-content">
+    <div class="content-header">
+        <h1>Profile Settings</h1>
+    </div>
+    <div class="content-card">
+        <form id="profileForm" class="profile-form">
+            <div class="form-group">
+                <label for="profileFirstName">First Name</label>
+                <input type="text" id="profileFirstName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="profileLastName">Last Name</label>
+                <input type="text" id="profileLastName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="profileEmail">Email Address</label>
+                <input type="email" id="profileEmail" required>
+            </div>
+
+            <div class="profile-actions">
+                <button type="submit" class="primary-button">Update Profile</button>
+                <button type="button" id="logoutBtn" class="secondary-button">Logout</button>
+            </div>
+        </form>
+
+        <div class="danger-zone">
+            <h3>Danger Zone</h3>
+            <p class="warning-text">Once you delete your account, there is no going back. Please be certain.</p>
+            <button id="deleteAccountBtn" class="delete-account-button">Delete Account</button>
+        </div>
+    </div>
+</div>
+
+<!-- Event Detail View -->
+<div id="eventDetailView" class="tab-content">
+    <div class="content-header">
+        <h1>Event Details</h1>
+    </div>
+    <div class="content-card">
+        <div id="eventDetail">
+            <!-- Event details will be dynamically populated here -->
+        </div>
+        <div class="section-card">
+            <button type="button" class="collapsible">Dates</button>
+            <div class="content">
+                <div id="eventDatesList" class="dates-list"></div>
+            </div>
+        </div>
+        <div class="section-card">
+            <button type="button" class="collapsible">Locations</button>
+            <div class="content">
+                <div id="eventLocationsList" class="location-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</main>
+</div>
+
+<!-- Mobile Menu Toggle (visible on small screens) -->
+<button id="mobileMenuToggle" class="mobile-menu-toggle">
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+<line x1="3" y1="12" x2="21" y2="12"></line>
+<line x1="3" y1="6" x2="21" y2="6"></line>
+<line x1="3" y1="18" x2="21" y2="18"></line>
+</svg>
+</button>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const collapsibles = document.querySelectorAll('.collapsible');
+        collapsibles.forEach(collapsible => {
+            collapsible.addEventListener('click', function() {
+                this.classList.toggle('active');
+                const content = this.nextElementSibling;
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                } else {
+                    content.style.display = 'block';
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

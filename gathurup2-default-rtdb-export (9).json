@@ -1,0 +1,106 @@
+{
+  "users": {
+    "jOU25axbFlalEAo2hIeqEDbA4dk2": {
+      "events": {
+        "-OCaPF_ztPNfrA0t9r5m": {
+          "anonymous": false,
+          "created": "2024-11-26T02:59:40.227Z",
+          "dates": [
+            {
+              "displayRange": "11/25/24 to 11/25/24",
+              "end": "2024-11-25",
+              "start": "2024-11-25"
+            },
+            {
+              "displayRange": "11/29/24 to 11/29/24",
+              "end": "2024-11-29",
+              "start": "2024-11-29"
+            },
+            {
+              "displayRange": "11/28/24 to 11/28/24",
+              "end": "2024-11-28",
+              "start": "2024-11-28"
+            }
+          ],
+          "description": "testing",
+          "locations": [
+            {
+              "description": "adfas",
+              "imageUrl": "https://firebasestorage.googleapis.com/v0/b/gathurup2.firebasestorage.app/o/locations%2FjOU25axbFlalEAo2hIeqEDbA4dk2%2F1732590024038_Miami.png?alt=media&token=1b1e46e5-48cb-4c77-a3c8-2ec8491faf00",
+              "name": "Miami",
+              "votes": {
+                "no": 0,
+                "yes": 0
+              }
+            },
+            {
+              "description": "teata",
+              "imageUrl": "https://firebasestorage.googleapis.com/v0/b/gathurup2.firebasestorage.app/o/locations%2FjOU25axbFlalEAo2hIeqEDbA4dk2%2F1732592281501_NewOrleans.png?alt=media&token=afd34a94-d001-4bf3-b6d5-8491579b519d",
+              "name": "New Orleans",
+              "votes": {
+                "no": 0,
+                "yes": 0
+              }
+            }
+          ],
+          "participants": {
+            "David": {
+              "dateVotes": [
+                2,
+                2
+              ],
+              "lastUpdated": 1732590037048,
+              "locationVotes": [
+                2
+              ],
+              "name": "David",
+              "votes": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          "title": "Family Vacation",
+          "tribeId": "-OCW7SQDGY-g91ZEpoeV",
+          "type": "specific",
+          "userId": "jOU25axbFlalEAo2hIeqEDbA4dk2"
+        }
+      },
+      "people": {
+        "-OCW6ivmq5Xl1tfn6Zfm": {
+          "created": "2024-11-25T02:20:37.858Z",
+          "firstName": "David",
+          "lastName": "Lewis"
+        },
+        "-OCW7OnH2RT980QLlBpe": {
+          "created": "2024-11-25T02:23:33.412Z",
+          "firstName": "Tiffanie",
+          "lastName": "Lewis"
+        },
+        "-OCW7PybLMD_6KSWa4vz": {
+          "created": "2024-11-25T02:23:38.233Z",
+          "firstName": "Emily",
+          "lastName": "Lewis"
+        }
+      },
+      "profile": {
+        "email": "demandgendave@gmail.com",
+        "firstName": "David",
+        "lastName": "Lewis",
+        "subscription": "free",
+        "updatedAt": "2024-11-26T02:16:08.440Z"
+      },
+      "tribes": {
+        "-OCW7SQDGY-g91ZEpoeV": {
+          "members": [
+            "-OCW6ivmq5Xl1tfn6Zfm",
+            "-OCW7PybLMD_6KSWa4vz",
+            "-OCW7OnH2RT980QLlBpe"
+          ],
+          "name": "Lewis Family"
+        }
+      }
+    }
+  }
+}

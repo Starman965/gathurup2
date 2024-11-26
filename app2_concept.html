@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event | gathurUP</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .section-toggle {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--tiffany-blue);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+
+        .image-upload {
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .image-upload:hover {
+            border-color: var(--tiffany-blue);
+            background: rgba(129, 216, 208, 0.1);
+        }
+
+        .image-preview {
+            max-width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .location-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .location-item {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .location-image-upload {
+            height: 150px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            cursor: pointer;
+        }
+
+        .location-image-preview {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .budget-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr auto;
+            gap: 12px;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .remove-item {
+            color: var(--red);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .remove-item:hover {
+            background: rgba(203, 108, 230, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div id="mainContainer">
+        <!-- Sidebar remains the same -->
+        
+        <div class="main-content">
+            <div class="content-header">
+                <h1>Create Special Event</h1>
+            </div>
+
+            <div class="content-card">
+                <form id="specialEventForm" class="event-form">
+                    <!-- Basic Info Section -->
+                    <div class="form-group">
+                        <label for="eventTitle">Event Title</label>
+                        <input type="text" id="eventTitle" name="eventTitle" placeholder="e.g., Sarah's Bachelorette Weekend">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventDescription">Event Description</label>
+                        <textarea id="eventDescription" name="eventDescription" placeholder="Describe the event..."></textarea>
+                    </div>
+
+                    <div class="image-upload" onclick="document.getElementById('headerImage').click()">
+                        <input type="file" id="headerImage" hidden accept="image/*">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        <p>Click to upload header image</p>
+                        <img id="headerPreview" class="image-preview">
+                    </div>
+
+                    <!-- Section Toggles -->
+                    <h3>Enable Sections</h3>
+                    
+                    <div class="section-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked name="enableDates">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Date Selection</span>
+                    </div>
+
+                    <div class="section-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked name="enableBudget">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Budget Options</span>
+                    </div>
+
+                    <div class="section-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked name="enableLocation">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Location Selection</span>
+                    </div>
+
+                    <div class="section-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked name="enableActivities">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Activities</span>
+                    </div>
+
+                    <div class="section-toggle">
+                        <label class="toggle-switch">
+                            <input type="checkbox" checked name="enablePacking">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Packing List</span>
+                    </div>
+
+                    <!-- Date Options -->
+                    <div id="dateSection" class="form-section">
+                        <h3>Date Options</h3>
+                        <div id="dateInputs">
+                            <!-- Existing date input options -->
+                        </div>
+                        <button type="button" class="secondary-button" onclick="addDateOption()">+ Add Date Option</button>
+                    </div>
+
+                    <!-- Budget Options -->
+                    <div id="budgetSection" class="form-section">
+                        <h3>Budget Options</h3>
+                        <div id="budgetItems">
+                            <div class="budget-item">
+                                <input type="text" placeholder="Amount range" value="$500-750">
+                                <input type="text" placeholder="Description" value="Basic weekend package">
+                                <button type="button" class="remove-item">&times;</button>
+                            </div>
+                            <div class="budget-item">
+                                <input type="text" placeholder="Amount range" value="$750-1000">
+                                <input type="text" placeholder="Description" value="Standard weekend package">
+                                <button type="button" class="remove-item">&times;</button>
+                            </div>
+                        </div>
+                        <button type="button" class="secondary-button" onclick="addBudgetOption()">+ Add Budget Option</button>
+                    </div>
+
+                    <!-- Location Options -->
+                    <div id="locationSection" class="form-section">
+                        <h3>Location Options</h3>
+                        <div class="location-grid">
+                            <div class="location-item">
+                                <div class="location-image-upload" onclick="document.getElementById('location1Image').click()">
+                                    <input type="file" id="location1Image" hidden accept="image/*">
+                                    <span>+ Add Location Image</span>
+                                </div>
+                                <img class="location-image-preview">
+                                <input type="text" placeholder="Location Name" value="Miami Beach">
+                                <textarea placeholder="Location Description">Beach vibes, amazing nightlife, and luxury spa options!</textarea>
+                            </div>
+                            <!-- More location items -->
+                        </div>
+                        <button type="button" class="secondary-button" onclick="addLocationOption()">+ Add Location</button>
+                    </div>
+
+                    <!-- Activities Section -->
+                    <div id="activitiesSection" class="form-section">
+                        <h3>Suggested Activities</h3>
+                        <div id="activityItems">
+                            <!-- Activity items -->
+                        </div>
+                        <button type="button" class="secondary-button" onclick="addActivityOption()">+ Add Activity</button>
+                    </div>
+
+                    <!-- Packing Categories -->
+                    <div id="packingSection" class="form-section">
+                        <h3>Packing Categories</h3>
+                        <div id="packingCategories">
+                            <div class="form-group">
+                                <label>Category Name</label>
+                                <input type="text" value="Clothing & Accessories">
+                                <textarea placeholder="Default suggestions...">Cocktail Dresses&#10;Comfortable Walking Shoes&#10;Swimwear & Cover-ups</textarea>
+                            </div>
+                        </div>
+                        <button type="button" class="secondary-button" onclick="addPackingCategory()">+ Add Category</button>
+                    </div>
+
+                    <div class="form-group" style="margin-top: 24px;">
+                        <button type="submit" class="primary-button">Create Event</button>
+                        <button type="button" class="secondary-button">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Image upload preview
+        document.getElementById('headerImage').addEventListener('change', function(e) {
+            const preview = document.getElementById('headerPreview');
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Toggle section visibility based on checkboxes
+        document.querySelectorAll('.section-toggle input').forEach(toggle => {
+            toggle.addEventListener('change', function() {
+                const section = this.name.replace('enable', '');
+                const sectionDiv = document.getElementById(section.toLowerCase() + 'Section');
+                if (sectionDiv) {
+                    sectionDiv.style.display = this.checked ? 'block' : 'none';
+                }
+            });
+        });
+
+        // Add form submission handler
+        document.getElementById('specialEventForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            // Add your form submission logic here
+            // This should integrate with your existing Firebase setup
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Preferences</title>
+    <link rel="icon" href="gathurup.ico" type="image/x-icon">
+    <meta property="og:image" content="https://www.gathurup.com/gathurUP_teal_1200.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="1200" />
+    <link rel="stylesheet" href="styles_event.css">
+</head>
+<body>
+    <div class="header-container">
+        <div class="logo-container">
+            <a href="https://gathurup.com/app.html">
+                <img src="gathurUP.png" alt="gatherUP Logo">
+            </a>
+        </div>
+        <div class="header-text">
+            <h1 id="eventTitleDisplay"></h1>
+            <p id="eventDescriptionDisplay"></p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Date Preferences</h2>
+        <div id="votingTableContainer"></div>
+    </div>
+
+    <div class="card">
+        <h2>Location Preferences</h2>
+        <div id="locationPreferencesContainer" class="location-options">
+            <!-- This section will be dynamically populated with JavaScript -->
+        </div>
+    </div>
+
+    <div id="submitContainer" style="text-align: center; margin-top: 20px; display: none;">
+        <button class="submit-btn" onclick="submitPreferences()">Submit</button>
+    </div>
+
+    <div id="nameCaptureModal" class="name-capture">
+        <div class="name-capture-content">
+            <h2>Welcome!</h2>
+            <p id="loadingMessage">Loading...</p>
+            <p id="errorMessage" style="color: red; display: none;"></p>
+            <div id="nameSelectContainer" style="display: none;">
+                <p>Please select your name to continue</p>
+                <select id="voterName" class="name-select">
+                    <option value="">Choose your name...</option>
+                </select>
+                <button class="submit-btn" onclick="startVoting()">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { firebaseConfig } from './firebase-config.js';
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        let currentVotes = [];
+        let currentLocationVotes = [];
+        let voterName = '';
+
+        function formatDateRange(dateRange) {
+            if (dateRange.type === 'dayOfWeek') {
+                return dateRange.days.join('<br>');
+            }
+            
+            const startDate = new Date(dateRange.start + 'T00:00:00');
+            const endDate = new Date(dateRange.end + 'T00:00:00');
+            
+            if (dateRange.start === dateRange.end) {
+                const dayOfWeek = startDate.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    timeZone: 'UTC'
+                });
+                const date = startDate.toLocaleDateString('en-US', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    year: '2-digit',
+                    timeZone: 'UTC'
+                });
+                return `${dayOfWeek}<br>${date}`;
+            }
+            
+            return `${startDate.toLocaleDateString('en-US', {
+                month: '2-digit',
+                day: '2-digit',
+                year: '2-digit',
+                timeZone: 'UTC'
+            })} to ${endDate.toLocaleDateString('en-US', {
+                month: '2-digit',
+                day: '2-digit',
+                year: '2-digit',
+                timeZone: 'UTC'
+            })}`;
+        }
+
+        function renderVotingTable(event) {
+            const container = document.getElementById('votingTableContainer');
+            const table = document.createElement('table');
+            table.className = 'voting-table';
+            
+            const headerRow = document.createElement('tr');
+            headerRow.innerHTML = `<th>Name</th>`;
+
+            if (event.anonymous) {
+                const notice = document.createElement('div');
+                notice.className = 'anonymous-notice';
+                notice.textContent = 'Responses are anonymous. You can only see your own response.';
+                container.appendChild(notice);
+            }
+
+            event.dates.forEach(dateRange => {
+                headerRow.innerHTML += `
+                    <th>
+                        <div class="date-header">
+                            ${formatDateRange(dateRange)}
+                        </div>
+                    </th>`;
+            });
+            table.appendChild(headerRow);
+
+            const votingRow = document.createElement('tr');
+            votingRow.className = 'current-voter';
+            votingRow.innerHTML = `<td><strong>${voterName}</strong></td>`;
+            
+            const existingVotes = event.participants?.[voterName]?.dateVotes;
+            const numOptions = event.dates.length;
+            currentVotes = existingVotes || new Array(numOptions).fill(-1);
+
+            currentVotes.forEach((vote, index) => {
+                let cellClass = 'vote-pending';
+                let cellContent = '?';
+
+                if (vote === 2) {
+                    cellClass = 'vote-yes';
+                    cellContent = '✓';
+                } else if (vote === 0) {
+                    cellClass = 'vote-no';
+                    cellContent = '✗';
+                }
+                
+                const td = document.createElement('td');
+                td.className = cellClass;
+                td.textContent = cellContent;
+                td.dataset.index = index;
+                td.addEventListener('click', () => window.toggleVote(index));
+                votingRow.appendChild(td);
+            });
+            table.appendChild(votingRow);
+
+            if (!event.anonymous) {
+                Object.entries(event.participants || {}).forEach(([name, data]) => {
+                    if (name !== voterName) {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `<td>${name}</td>`;
+                        data.dateVotes.forEach(vote => {
+                            const symbol = vote === 2 ? '✓' : '✗';
+                            const voteClass = vote === 2 ? 'vote-yes' : 'vote-no';
+                            row.innerHTML += `<td class="${voteClass}">${symbol}</td>`;
+                        });
+                        table.appendChild(row);
+                    }
+                });
+            }
+
+            container.innerHTML = '';
+            container.appendChild(table);
+        }
+
+        function renderLocationPreferences(event) {
+            const container = document.getElementById('locationPreferencesContainer');
+            container.innerHTML = '';
+
+            const existingLocationVotes = event.participants?.[voterName]?.locationVotes || [];
+
+            event.locations.forEach((location, index) => {
+                const locationCard = document.createElement('div');
+                locationCard.className = 'location-card';
+                locationCard.innerHTML = `
+                    <img src="${location.imageUrl || 'default_image.png'}" alt="${location.name}" class="location-image">
+                    <div class="location-details">
+                        <h3 class="location-title">${location.name}</h3>
+                        <p>${location.description}</p>
+                        <div class="vote-buttons">
+                            <button class="vote-button" id="yes-button-${index}" onclick="voteLocation(${index}, 2)">
+                                👍 Yes!
+                            </button>
+                            <button class="vote-button" id="no-button-${index}" onclick="voteLocation(${index}, 0)">
+                                👎 No
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(locationCard);
+
+                // Highlight the user's previous vote
+                if (existingLocationVotes[index] === 2) {
+                    document.getElementById(`yes-button-${index}`).classList.add('selected');
+                } else if (existingLocationVotes[index] === 0) {
+                    document.getElementById(`no-button-${index}`).classList.add('selected');
+                }
+            });
+        }
+
+        window.voteLocation = function(index, vote) {
+            currentLocationVotes[index] = vote;
+            const yesButton = document.getElementById(`yes-button-${index}`);
+            const noButton = document.getElementById(`no-button-${index}`);
+
+            if (vote === 2) {
+                yesButton.disabled = true;
+                noButton.disabled = false;
+                if (noButton.classList.contains('selected')) {
+                    noButton.classList.remove('selected');
+                }
+                yesButton.classList.add('selected');
+            } else if (vote === 0) {
+                noButton.disabled = true;
+                yesButton.disabled = false;
+                if (yesButton.classList.contains('selected')) {
+                    yesButton.classList.remove('selected');
+                }
+                noButton.classList.add('selected');
+            }
+        };
+
+        window.toggleVote = function(index) {
+            const currentValue = currentVotes[index];
+            let newValue;
+            let newClass;
+            let newContent;
+            
+            if (currentValue === -1) {
+                newValue = 2;
+                newClass = 'vote-yes';
+                newContent = '✓';
+            } else if (currentValue === 2) {
+                newValue = 0;
+                newClass = 'vote-no';
+                newContent = '✗';
+            } else {
+                newValue = -1;
+                newClass = 'vote-pending';
+                newContent = '?';
+            }
+            
+            currentVotes[index] = newValue;
+            
+            const cell = document.querySelector(`.voting-table td[data-index="${index}"]`);
+            if (cell) {
+                cell.className = newClass;
+                cell.textContent = newContent;
+            }
+        };
+
+        window.updateLocationVote = function(index, value) {
+            currentLocationVotes[index] = parseInt(value);
+        };
+
+        window.startVoting = async function() {
+            const nameInput = document.getElementById('voterName');
+            if (!nameInput.value) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            voterName = nameInput.value;
+            currentVotes = [];
+            currentLocationVotes = [];
+            document.getElementById('nameCaptureModal').style.display = 'none';
+            document.getElementById('votingTableContainer').style.display = 'block';
+            document.getElementById('submitContainer').style.display = 'block';
+            await loadEventData();
+        };
+
+        async function loadEventData() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const eventId = urlParams.get('event');
+                const userId = urlParams.get('user');
+                
+                if (!eventId || !userId) {
+                    throw new Error('Invalid event link');
+                }
+
+                const eventRef = ref(database, `users/${userId}/events/${eventId}`);
+                const eventSnap = await get(eventRef);
+                
+                if (!eventSnap.exists()) {
+                    throw new Error('Event not found');
+                }
+
+                const event = eventSnap.val();
+                
+                document.getElementById('eventTitleDisplay').textContent = event.title;
+                document.getElementById('eventDescriptionDisplay').textContent = event.description;
+
+                if (voterName && event.participants && event.participants[voterName]) {
+                    currentVotes = [...event.participants[voterName].dateVotes];
+                    currentLocationVotes = event.participants[voterName].locationVotes ? [...event.participants[voterName].locationVotes] : new Array(event.locations.length).fill(-1);
+                } else {
+                    const numOptions = event.type === 'dayOfWeek' ? 
+                        event.dates[0].days.length : 
+                        event.dates.length;
+                    currentVotes = new Array(numOptions).fill(-1);
+                    currentLocationVotes = new Array(event.locations.length).fill(-1);
+                }
+
+                if (!event.tribeId) {
+                    throw new Error('No tribe assigned to this event');
+                }
+
+                const tribeRef = ref(database, `users/${userId}/tribes/${event.tribeId}`);
+                const tribeSnap = await get(tribeRef);
+                
+                if (!tribeSnap.exists()) {
+                    throw new Error('Tribe not found');
+                }
+
+                const tribe = tribeSnap.val();
+
+                const peopleRef = ref(database, `users/${userId}/people`);
+                const peopleSnap = await get(peopleRef);
+                const people = peopleSnap.val() || {};
+
+                const membersList = [];
+                tribe.members.forEach(memberId => {
+                    const person = people[memberId];
+                    if (person) {
+                        membersList.push({
+                            id: memberId,
+                            firstName: person.firstName,
+                            lastName: person.lastName
+                        });
+                    }
+                });
+
+                membersList.sort((a, b) => 
+                    (a.firstName + a.lastName).toLowerCase().localeCompare((b.firstName + b.lastName).toLowerCase())
+                );
+
+                const voterSelect = document.getElementById('voterName');
+                voterSelect.innerHTML = '<option value="">Choose your name...</option>';
+
+                membersList.forEach(person => {
+                    const option = document.createElement('option');
+                    option.value = person.firstName;
+                    option.textContent = `${person.firstName} ${person.lastName}`;
+                    voterSelect.appendChild(option);
+                });
+
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('nameSelectContainer').style.display = 'block';
+
+                if (voterName && event.participants && event.participants[voterName]) {
+                    currentVotes = event.participants[voterName].dateVotes;
+                    currentLocationVotes = event.participants[voterName].locationVotes ? event.participants[voterName].locationVotes : new Array(event.locations.length).fill(-1);
+                }
+                
+                if (voterName) {
+                    renderVotingTable(event);
+                    renderLocationPreferences(event);
+                }
+
+            } catch (error) {
+                console.error('Error loading event:', error);
+                document.getElementById('loadingMessage').style.display = 'none';
+                document.getElementById('errorMessage').textContent = 'Error loading event: ' + error.message;
+                document.getElementById('errorMessage').style.display = 'block';
+            }
+        }
+
+        window.submitPreferences = async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const eventId = urlParams.get('event');
+            const userId = urlParams.get('user');
+
+            try {
+                const eventRef = ref(database, `users/${userId}/events/${eventId}/participants/${voterName}`);
+                await set(eventRef, {
+                    name: voterName,
+                    dateVotes: currentVotes,
+                    locationVotes: currentLocationVotes,
+                    lastUpdated: Date.now()
+                });
+                window.location.href = `confirmation.html?event=${eventId}&user=${userId}&name=${voterName}`;
+            } catch (error) {
+                console.error('Error submitting preferences:', error);
+                alert('Error submitting preferences');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const preselectedName = urlParams.get('name');
+            if (preselectedName) {
+                document.getElementById('voterName').value = preselectedName;
+                window.startVoting();
+            }
+        });
+
+        loadEventData().catch(console.error);
+    </script>
+    <div class="instructions">
+        <h1>How to Submit Your Preferences</h1>
+        <ol>
+            <li>Click each of the (?) under each date</li>
+            <li>(✓) means this date works for you</li>
+            <li>(✗) means this date doesn't work for you</li>
+            <li>(?) means maybe/neutral or no response provided</li>
+            <li>Keep clicking to switch through the various responses</li>
+            <li>Select your preference for each location</li>
+            <li>Click "Submit" when you're finished</li>
+            <li>You can return to change your responses using the link provided to you</li>
+        </ol>
+    </div>
+    <div>
+        <p>&copy; 2024 Created by Tiffanie and David Lewis</p>
+    </div>
+</body>
+</html>
