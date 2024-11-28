@@ -324,6 +324,11 @@
                     }
                 }
 
+                // Ensure the event object is available
+                const eventRef = ref(database, `users/${userId}/events/${eventId}`);
+                const eventSnap = await get(eventRef);
+                const event = eventSnap.val();
+
                 // Render location preferences with the user's current selection
                 await renderLocationPreferences(event.locations, userId, eventId);
             } catch (error) {
