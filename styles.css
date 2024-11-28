@@ -2,7 +2,7 @@
     --tiffany-blue: #81D8D0;
     --header-bg: #000000;
     --green: #6CE6CB;
-    --red: #CB6ce6;
+    --gray: #868686;
     --yellow: #FFC87E;
     --primary: var(--header-bg);
     --border-color: #E5E5E5;
@@ -188,7 +188,10 @@ body {
 .form-group {
     margin-bottom: 20px;
 }
-
+.form-group input[type="text"],
+.form-group textarea {
+    padding-right: 15px; /* Adjust the value as needed */
+}
 .add-person-form {
     display: flex;
     gap: 8px;
@@ -214,8 +217,8 @@ input[type="password"],
 input[type="date"],
 select,
 textarea {
-    width: 100%;
-    padding: 12px;
+    width: 95%;
+    padding: 6px;
     border: 2px solid var(--border-color);
     border-radius: 8px;
     font-size: 16px;
@@ -246,6 +249,7 @@ textarea {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
+    margin-bottom: 8px; /* Puts space below buttons */
 }
 
 .primary-button:hover {
@@ -266,6 +270,17 @@ textarea {
 
 .secondary-button:hover {
     background: #f8f9fa;
+}
+
+/* Add padding below the "Add Location" button */
+#addLocationBtn {
+    margin-bottom: 5px; /* Adjust the value as needed */
+}
+
+/* Adjust padding for the "Add Date" button */
+#addSpecificDateBtn,
+#addDateBtn {
+    padding-left: 8px; /* Adjust the value as needed */
 }
 
 /* Event Type Selection */
@@ -585,6 +600,10 @@ textarea {
     gap: 8px;
 }
 
+.section-title svg {
+    margin-right: 8px;
+}
+
 /* Description Section */
 .description-section {
     background: #f8f9fa;
@@ -772,8 +791,8 @@ textarea {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    align-items: flex-start; /* Ensure items are left aligned */
 }
-
 #tribeName {
     max-width: 300px;
 }
@@ -908,11 +927,15 @@ textarea {
 }
 
 .yes-votes {
-    color: var(--green);
+    color: #81D8D0; /* A more vibrant green */
+    font-weight: bold; /* Make the text bold */
+
 }
 
 .no-votes {
-    color: var(--red);
+    color: #964048; /* A more vibrant red */
+    font-weight: bold; /* Make the text bold */
+   
 }
 
 /* Vote Indicators */
@@ -925,14 +948,26 @@ textarea {
     border-radius: 4px;
 }
 
-.vote-yes {
-    background: rgba(108, 230, 203, 0.1);
-    color: var(--green);
+.yes-votes {
+    color: #2e2e2e; /* A dark gray */
+    font-weight: bold; /* Make the text bold */
 }
 
 .vote-no {
-    background: rgba(203, 108, 230, 0.1);
-    color: var(--red);
+    color: #2e2e2e; /* A dark gray */
+    font-weight: bold; /* Make the text bold */
+}
+
+.vote-yes {
+    color: #2e2e2e; /* Text color for yes votes */
+    font-weight: bold; /* Make the text bold */
+    font-size: 16px; /* Font size for the check mark */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px; /* Optional: add some border radius */
+    width: 24px; /* Width of the cell */
+    height: 24px; /* Height of the cell */
 }
 
 .vote-pending {
@@ -1117,15 +1152,15 @@ textarea {
 .votes-table td {
     padding: 12px;
     text-align: center;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var (--border-color);
     border-right: 1px solid var(--border-color);
     background: white;
 }
 
 .votes-table th {
-    background: #f8f9fa;
+    background: #000000;
     font-weight: 500;
-    color: var(--subhead-color);
+    color: #ffffff; /* Updated text color for table headers */
     white-space: nowrap;
 }
 
@@ -1471,4 +1506,48 @@ textarea {
 
 .action-button.delete:hover {
     color: var(--red);
+}
+
+.checkbox-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 20px;
+    width: 20px;
+    background-color: #eee;
+    border-radius: 4px;
+}
+
+.modern-checkbox:hover input ~ .checkmark {
+    background-color: #ccc;
+}
+
+.modern-checkbox input:checked ~ .checkmark {
+    background-color: var(--tiffany-blue);
+}
+
+.checkmark:after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.modern-checkbox input:checked ~ .checkmark:after {
+    display: block;
+}
+
+.modern-checkbox .checkmark:after {
+    left: 7px;
+    top: 3px;
+    width: 6px;
+    height: 12px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
 }

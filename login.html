@@ -36,6 +36,14 @@
                 <input type="text" id="signupFirstNameInput" placeholder="First Name" required>
                 <input type="text" id="signupLastNameInput" placeholder="Last Name" required>
                 <input type="email" id="signupEmailInput" placeholder="Email" required>
+                <select id="signupTimezoneInput" required>
+                    <option value="">Select Time Zone</option>
+                    <option value="America/Los_Angeles">Pacific Time (US & Canada)</option>
+                    <option value="America/New_York">Eastern Time (US & Canada)</option>
+                    <option value="America/Chicago">Central Time (US & Canada)</option>
+                    <option value="America/Denver">Mountain Time (US & Canada)</option>
+                    <!-- Add more time zones as needed -->
+                </select>
                 <input type="password" id="signupPasswordInput" placeholder="Password" required>
                 <input type="password" id="signupConfirmPasswordInput" placeholder="Confirm Password" required>
                 <button id="emailSignupBtn" class="submit-btn">Sign Up</button>
@@ -90,6 +98,7 @@
             const email = document.getElementById('signupEmailInput').value;
             const password = document.getElementById('signupPasswordInput').value;
             const confirmPassword = document.getElementById('signupConfirmPasswordInput').value;
+            const timezone = document.getElementById('signupTimezoneInput').value;
 
             if (password !== confirmPassword) {
                 alert("Passwords don't match");
@@ -116,7 +125,9 @@
                     firstName: firstName,
                     lastName: lastName,
                     email: email,
-                    subscription: 'free',
+                    timezone: timezone,
+                    subscription: 'free', // Set subscription to beta
+                    version: 'beta', // Set version to beta
                     createdAt: new Date().toISOString()
                 });
 
@@ -151,6 +162,19 @@
                 alert(error.message || "Error sending reset email");
             }
         });
+
+        function setDefaultTimezone() {
+            const timezoneSelect = document.getElementById('signupTimezoneInput');
+            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            for (let option of timezoneSelect.options) {
+                if (option.value === userTimezone) {
+                    option.selected = true;
+                    break;
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', setDefaultTimezone);
     </script>
 </body>
 </html>
