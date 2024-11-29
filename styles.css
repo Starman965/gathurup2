@@ -559,22 +559,25 @@ textarea {
 .time-input {
     display: inline-block;
     text-align: center;
-    margin-right: 2px; /* Reduce spacing between inputs */
+    margin-right: 5px; /* Adjust spacing between inputs */
 }
 
 .time-input:last-child {
-    margin-right: 2; /* Remove margin from the last input */
+    margin-right: 0; /* Remove margin from the last input */
 }
 
 .time-input label {
     display: block;
     margin-bottom: 2px; /* Adjust spacing between label and dropdown */
 }
+
 #timeFields {
-    display: none; /* Hide by default */
-    flex-wrap: wrap;
-    gap: 8px;
+    display: flex; /* Use flexbox to keep fields on a single row */
+    flex-wrap: nowrap; /* Prevent wrapping */
+    gap: 8px; /* Adjust spacing between inputs */
+    align-items: center; /* Align items vertically */
 }
+
 #specificTimeHour,
 #specificTimeMinute,
 #specificTimePeriod {
@@ -1386,10 +1389,27 @@ textarea {
 /* Date Field Row */
 .date-field-row {
     display: flex;
-    align-items: flex-end;
-    gap: 8px; /* sets width of date fields */
+    flex-direction: column; /* Stack items vertically */
+    gap: 8px; /* Adjust spacing between items */
 }
+.date-field-row .time-inputs {
+    display: flex;
+    flex-wrap: nowrap; /* Prevent wrapping */
+    gap: 8px; /* Adjust spacing between inputs */
+    align-items: center; /* Align items vertically */
+}
+.date-field-row .add-date-button {
+    margin-top: 8px; /* Add margin to separate the button from the inputs */
+}
+@media (max-width: 480px) {
+    .date-field-row {
+        flex-direction: column; /* Stack items vertically on small screens */
+    }
 
+    .date-field-row .time-inputs {
+        flex-wrap: wrap; /* Allow wrapping on small screens */
+    }
+}
 .date-field-row > div {
     flex: 1;
 }

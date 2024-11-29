@@ -56,23 +56,22 @@ function formatDateForDisplay(dateStr, timeStr, timezone) {
     if (timeStr) {
         date = new Date(`${dateStr}T${timeStr}:00`);
     } else {
-        date = new Date(dateStr);
+        date = new Date(`${dateStr}T00:00:00`); // Use local time zone
     }
 
     if (isNaN(date.getTime())) {
         return 'Invalid Date';
     }
 
-    return date.toLocaleString('en-US', {
+    return new Intl.DateTimeFormat('en-US', {
         month: '2-digit',
         day: '2-digit',
         year: '2-digit',
         hour: timeStr ? '2-digit' : undefined,
         minute: timeStr ? '2-digit' : undefined,
         timeZone: timezone
-    });
+    }).format(date);
 }
-
 function sortPeopleArray(people) {
     return Object.entries(people)
         .sort((a, b) => {
@@ -563,8 +562,9 @@ function addDate() {
     const startDateInput = document.getElementById('startDateInput');
     const endDateInput = document.getElementById('endDateInput');
     const eventType = document.querySelector('input[name="eventType"]:checked').value;
+    const timezone = document.getElementById('profileTimezone').value;
 
-    let specificTime = '';
+    let specificTime = null;
     if (addTimesCheckbox.checked) {
         let hour = parseInt(specificTimeHour, 10);
         if (specificTimePeriod === 'PM' && hour !== 12) {
@@ -579,24 +579,20 @@ function addDate() {
         selectedDates.push({
             start: specificDateInput.value,
             end: specificDateInput.value,
-            time: addTimesCheckbox.checked ? specificTime : null,
-            displayRange: addTimesCheckbox.checked
-                ? formatDateForDisplay(specificDateInput.value, specificTime, document.getElementById('profileTimezone').value)
-                : formatDateForDisplay(specificDateInput.value, '00:00', document.getElementById('profileTimezone').value)
+            time: specificTime,
+            displayRange: formatDateForDisplay(specificDateInput.value, specificTime, timezone)
         });
     } else if (eventType === 'range' && startDateInput.value && endDateInput.value) {
         selectedDates.push({
             start: startDateInput.value,
             end: endDateInput.value,
             time: null,
-            displayRange: `${formatDateForDisplay(startDateInput.value, '00:00', document.getElementById('profileTimezone').value)} to ${formatDateForDisplay(endDateInput.value, '23:59', document.getElementById('profileTimezone').value)}`
+            displayRange: `${formatDateForDisplay(startDateInput.value, '00:00', timezone)} to ${formatDateForDisplay(endDateInput.value, '23:59', timezone)}`
         });
     }
 
     renderDates();
 }
-
-
 // Call setDatePickerDefaults when the event type changes
 function handleEventTypeChange() {
     const eventType = document.querySelector('input[name="eventType"]:checked')?.value;
