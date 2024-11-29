@@ -397,7 +397,14 @@ textarea {
     color: var(--subhead-color);
     align-items: center; /* Ensure vertical alignment */
 }
-
+#eventsTableHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #f9f9f9;
+    border-bottom: 1px solid #e5e5e5;
+}
 .events-rows {
     display: flex;
     flex-direction: column;
@@ -914,6 +921,7 @@ textarea {
     border: 2px solid var(--green); /* Example highlight color */
     background-color: rgba(108, 230, 203, 0.1); /* Example highlight background */
 }
+
 .vote-stats {
     display: flex;
     gap: 16px;
@@ -975,6 +983,12 @@ textarea {
     color: #666;
 }
 
+.highlight {
+    background-color: #ffeb3b; /* Yellow background */
+    border: 2px solid #fbc02d; /* Darker yellow border */
+    padding: 10px;
+    border-radius: 5px;
+}
 /* Mobile Menu */
 .mobile-menu-toggle {
     display: none;

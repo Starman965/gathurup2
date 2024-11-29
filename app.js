@@ -260,9 +260,14 @@ async function deleteAccount() {
 
 // Navigation Functions
 function showEventsList() {
+     // Show the events table header
+     document.getElementById('eventsTableHeader').style.display = 'flex';
+     
     const eventsList = document.getElementById('eventsList');
     const eventDetailView = document.getElementById('eventDetailView');
-    
+     // Show the events table header
+    document.getElementById('eventsTableHeader').style.display = 'flex';
+
     if (eventsList) {
         eventsList.style.display = 'block';
     }
@@ -302,7 +307,6 @@ async function createEvent(e) {
         title: document.getElementById('eventTitle').value,
         description: document.getElementById('eventDescription').value,
         type: document.querySelector('input[name="eventType"]:checked').value,
-        anonymous: document.getElementById('anonymousResponses').checked,
         includeDatePreferences: document.getElementById('includeDatePreferences').checked,
         includeLocationPreferences: document.getElementById('includeLocationPreferences').checked,
          dates: selectedDates.map(dateRange => {
@@ -376,7 +380,7 @@ function resetCreateEventForm() {
     document.getElementById('eventDescription').value = '';
     document.getElementById('tribeSelect').value = '';
     document.querySelector('input[name="eventType"][value="specific"]').checked = true;
-    document.getElementById('anonymousResponses').checked = false;
+
     document.getElementById('specificDateInput').value = '';
     document.getElementById('startDateInput').value = '';
     document.getElementById('endDateInput').value = '';
@@ -395,7 +399,7 @@ function resetEventForm() {
     document.getElementById('eventTitle').value = '';
     document.getElementById('eventDescription').value = '';
     document.getElementById('tribeSelect').value = '';
-    document.getElementById('anonymousResponses').checked = false;
+
 }
 
 // Location Management Functions
@@ -438,7 +442,6 @@ async function addLocation() {
         name,
         description,
         imageUrl,
-        votes: { yes: 0, no: 0 }
     };
 
     selectedLocations.push(location);
@@ -703,7 +706,10 @@ async function showEventDetail(eventId) {
     if (!currentUser || !eventId) return;
 
     try {
-        // Show loading state
+    // Hide the events table header
+    document.getElementById('eventsTableHeader').style.display = 'none';
+
+    // Show loading state
         const eventsList = document.getElementById('eventsList');
         if (!eventsList) throw new Error('Events list element not found');
         eventsList.style.display = 'none';
@@ -734,7 +740,8 @@ async function showEventDetail(eventId) {
         
         // Combine event data with tribe info
         eventData.tribeInfo = tribes[eventData.tribeId] || { name: 'Unknown Group' };
-
+// Ensure size is included in tribeInfo
+eventData.tribeInfo.size = eventData.tribeInfo.members.length;
         // Ensure dates and locations are arrays
         eventData.dates = eventData.dates || [];
         eventData.locations = eventData.locations || [];
@@ -778,27 +785,15 @@ async function showEventDetail(eventId) {
 }
 
 function renderVotesSummary(eventData) {
-    const participants = eventData.participants || {};
-    const yesVotesPerDate = eventData.dates.map((_, index) => 
-        Object.values(participants).filter(p => p.dateVotes[index] === 2).length
-    );
-    const maxYesVotes = Math.max(...yesVotesPerDate);
-
-    return eventData.dates.map((date, index) => {
-        const yesVotes = yesVotesPerDate[index];
-        const noVotes = Object.values(participants).filter(p => p.dateVotes[index] === 0).length;
-        const isMaxVotes = yesVotes === maxYesVotes && maxYesVotes > 0;
-
-        let displayText;
-        if (date.start === date.end) {
-            displayText = formatDateForDisplay(date.start, date.time, eventData.timezone);
-        } else {
-            displayText = `${formatDateForDisplay(date.start, '00:00', eventData.timezone)} to ${formatDateForDisplay(date.end, '23:59', eventData.timezone)}`;
-        }
+    const votes = eventData.votes || {};
+    return eventData.dates.map(date => {
+        const dateKey = `${date.start}T${date.time}`;
+        const yesVotes = Object.values(votes).filter(vote => vote.datePreferences[dateKey] === 'yes').length;
+        const noVotes = Object.values(votes).filter(vote => vote.datePreferences[dateKey] === 'no').length;
 
         return `
-            <div class="vote-card ${isMaxVotes ? 'best-date' : ''}">
-                <div class="vote-date">${displayText}</div>
+            <div class="vote-card">
+                <div class="vote-date">${date.displayRange}</div>
                 <div class="vote-stats">
                     <div class="stat-item yes-votes">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -821,104 +816,26 @@ function renderVotesSummary(eventData) {
 }
 
 function renderLocationVotesSummary(eventData) {
-    const participants = eventData.participants || {};
-    const locationVotes = eventData.locations.map((location, index) => {
-        const totalVotes = Object.values(participants).reduce((sum, p) => sum + (p.locationVotes[index] || 0), 0);
-        return {
-            ...location,
-            totalVotes
-        };
-    });
+    const votes = eventData.votes || {};
+    return eventData.locations.map(location => {
+        const locationKey = location.name;
+        const locationVotes = Object.values(votes).filter(vote => vote.locationPreferences.selectedLocation === locationKey).length;
 
-    const maxVotes = Math.max(...locationVotes.map(l => l.totalVotes));
-
-    return locationVotes.map(location => `
-        <div class="vote-card ${location.totalVotes === maxVotes && maxVotes > 0 ? 'best-location' : ''}">
-            <div class="vote-location">${location.name}</div>
-            <div class="vote-stats">
-                <div class="stat-item total-votes">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                        <polyline points="22 4 12 14.01 9 11.01"/>
-                    </svg>
-                    ${location.totalVotes}
+        return `
+            <div class="vote-card">
+                <div class="vote-location">${location.name}</div>
+                <div class="vote-stats">
+                    <div class="stat-item total-votes">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22 4 12 14.01 9 11.01"/>
+                        </svg>
+                        ${locationVotes}
+                    </div>
                 </div>
             </div>
-        </div>
-    `).join('');
-}
-
-function renderLocationIndividualResponses(eventData) {
-    const participants = eventData.participants || {};
-    const locations = eventData.locations || [];
-    
-    return `
-        <div class="votes-table-container">
-            <table class="votes-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        ${locations.map(location => `<th>${location.name}</th>`).join('')}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${Object.entries(participants).map(([name, data]) => `
-                        <tr>
-                            <td>${eventData.anonymous ? '(Anonymous)' : name}</td>
-                            ${(data.locationVotes || []).map((vote, index) => `
-                                <td class="votes-indicator-cell">
-                                    <div class="vote-indicator ${vote === 1 ? 'vote-yes' : vote === 0 ? 'vote-no' : 'vote-pending'}">
-                                        ${vote === 1 ? '✓' : vote === 0 ? '✗' : '?'}
-                                    </div>
-                                </td>
-                            `).join('')}
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
-}
-
-function renderIndividualResponses(eventData) {
-    const participants = eventData.participants || {};
-    
-    return `
-        <div class="votes-table-container">
-            <table class="votes-table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        ${eventData.dates.map(date => {
-                            if (date.start === date.end) {
-                                return `<th>${formatDateForDisplay(date.start, date.time, eventData.timezone)}</th>`;
-                            } else {
-                                return `<th>${formatDateForDisplay(date.start, '00:00', eventData.timezone)} to ${formatDateForDisplay(date.end, '23:59', eventData.timezone)}</th>`;
-                            }
-                        }).join('')}
-                    </tr>
-                </thead>
-                <tbody>
-                    ${Object.entries(participants).map(([name, data]) => `
-                        <tr>
-                            <td>${eventData.anonymous ? '(Anonymous)' : name}</td>
-                            ${data.dateVotes.map(vote => `
-                                <td class="votes-indicator-cell">
-                                    <div class="vote-indicator ${
-                                        vote === 2 ? 'vote-yes' : 
-                                        vote === 0 ? 'vote-no' : 
-                                        'vote-pending'
-                                    }">
-                                        ${vote === 2 ? '✓' : vote === 0 ? '✗' : '?'}
-                                    </div>
-                                </td>
-                            `).join('')}
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-        </div>
-    `;
+        `;
+    }).join('');
 }
 
 function renderEventDetail(eventId, eventData) {
@@ -942,7 +859,7 @@ function renderEventDetail(eventId, eventData) {
                             <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                             <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
                         </svg>
-                        ${eventData.tribeInfo.name}
+                                             ${eventData.tribeInfo.name} (${eventData.tribeInfo.size})</div>
                     </div>
                     <div class="meta-item">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -992,7 +909,7 @@ function renderEventDetail(eventId, eventData) {
                         <line x1="8" y1="2" x2="8" y2="6"/>
                         <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
-                    Availability Summary
+                    Dates
                 </h3>
                 <div class="votes-summary">
                     ${renderVotesSummary(eventData)}
@@ -1002,38 +919,13 @@ function renderEventDetail(eventId, eventData) {
             <div class="section-card">
                 <h3 class="section-title">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                    Individual Responses
-                </h3>
-                ${renderIndividualResponses(eventData)}
-            </div>
-            <div class="section-card">
-                <h3 class="section-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
                     </svg>
-                    Location Summary
+                    Locations
                 </h3>
                 <div class="votes-summary">
                     ${renderLocationVotesSummary(eventData)}
                 </div>
-            </div>
-
-            <div class="section-card">
-                <h3 class="section-title">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-                        <circle cx="9" cy="7" r="4"/>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-                    </svg>
-                    Individual Responses
-                </h3>
-                ${renderLocationIndividualResponses(eventData)}
             </div>
         </div>
     `;
@@ -1603,13 +1495,7 @@ function renderEventSettings() {
         <div class="section-card">
             <h3>Group Event Page Settings</h3>
             <div class="form-group">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="anonymousResponses">
-                    Make Date Responses Anonymous
-                </label>
-            </div>
-            <div class="form-group">
-                <label>Include These Section on The Group Event Page:</label>
+                <label>Include These Sections on The Group Event Page:</label>
                 <div class="checkbox-grid">
                     <label class="modern-checkbox">
                         <input type="checkbox" id="includeDatePreferences" checked>
