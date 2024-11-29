@@ -52,16 +52,23 @@ function getUserRef() {
 }
 
 function formatDateForDisplay(dateStr, timeStr, timezone) {
-    const date = new Date(`${dateStr}T${timeStr}`);
+    let date;
+    if (timeStr) {
+        date = new Date(`${dateStr}T${timeStr}:00`);
+    } else {
+        date = new Date(dateStr);
+    }
+
     if (isNaN(date.getTime())) {
         return 'Invalid Date';
     }
+
     return date.toLocaleString('en-US', {
         month: '2-digit',
         day: '2-digit',
         year: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
+        hour: timeStr ? '2-digit' : undefined,
+        minute: timeStr ? '2-digit' : undefined,
         timeZone: timezone
     });
 }
@@ -83,7 +90,7 @@ function getVoteUrl(eventId) {
 function showShareLink(eventId) {
     const shareLink = document.getElementById('shareLink');
     const shareLinkInput = document.getElementById('shareLinkInput');
-    const eventUrl = `${window.location.origin}/event.html?event=${eventId}&user=${currentUser.uid}`;
+    const eventUrl = `${window.location.origin}/gathurup2/event.html?event=${eventId}&user=${currentUser.uid}`;
     
     shareLinkInput.value = eventUrl;
     shareLink.style.display = 'block';
@@ -552,33 +559,43 @@ function addDate() {
     const specificTimeHour = document.getElementById('specificTimeHour').value;
     const specificTimeMinute = document.getElementById('specificTimeMinute').value;
     const specificTimePeriod = document.getElementById('specificTimePeriod').value;
+    const addTimesCheckbox = document.getElementById('addTimesCheckbox');
     const startDateInput = document.getElementById('startDateInput');
     const endDateInput = document.getElementById('endDateInput');
     const eventType = document.querySelector('input[name="eventType"]:checked').value;
 
-    let specificTime = `${specificTimeHour}:${specificTimeMinute} ${specificTimePeriod}`;
-    if (specificTimePeriod === 'PM' && specificTimeHour !== '12') {
-        specificTime = `${parseInt(specificTimeHour) + 12}:${specificTimeMinute}`;
-    } else if (specificTimePeriod === 'AM' && specificTimeHour === '12') {
-        specificTime = `00:${specificTimeMinute}`;
-    } else {
-        specificTime = `${specificTimeHour}:${specificTimeMinute}`;
+    let specificTime = '';
+    if (addTimesCheckbox.checked) {
+        let hour = parseInt(specificTimeHour, 10);
+        if (specificTimePeriod === 'PM' && hour !== 12) {
+            hour += 12;
+        } else if (specificTimePeriod === 'AM' && hour === 12) {
+            hour = 0;
+        }
+        specificTime = `${hour.toString().padStart(2, '0')}:${specificTimeMinute}`;
     }
 
     if (eventType === 'specific' && specificDateInput.value) {
-        selectedDates.push({ start: specificDateInput.value, time: specificTime, end: specificDateInput.value });
-        specificDateInput.value = ''; // Reset the input field
-        document.getElementById('specificTimeHour').value = '08'; // Reset the time fields to 8
-        document.getElementById('specificTimeMinute').value = '00';
-        document.getElementById('specificTimePeriod').value = 'AM';
+        selectedDates.push({
+            start: specificDateInput.value,
+            end: specificDateInput.value,
+            time: addTimesCheckbox.checked ? specificTime : null,
+            displayRange: addTimesCheckbox.checked
+                ? formatDateForDisplay(specificDateInput.value, specificTime, document.getElementById('profileTimezone').value)
+                : formatDateForDisplay(specificDateInput.value, '00:00', document.getElementById('profileTimezone').value)
+        });
     } else if (eventType === 'range' && startDateInput.value && endDateInput.value) {
-        selectedDates.push({ start: startDateInput.value, end: endDateInput.value });
-        startDateInput.value = ''; // Reset the input field
-        endDateInput.value = ''; // Reset the input field
+        selectedDates.push({
+            start: startDateInput.value,
+            end: endDateInput.value,
+            time: null,
+            displayRange: `${formatDateForDisplay(startDateInput.value, '00:00', document.getElementById('profileTimezone').value)} to ${formatDateForDisplay(endDateInput.value, '23:59', document.getElementById('profileTimezone').value)}`
+        });
     }
 
     renderDates();
 }
+
 
 // Call setDatePickerDefaults when the event type changes
 function handleEventTypeChange() {
@@ -1046,7 +1063,38 @@ window.editEventDates = async function(eventId) {
         alert('Error loading event for editing');
     }
 }
+function handleAddTimesCheckbox() {
+    const eventTypeRadios = document.querySelectorAll('input[name="eventType"]');
+    const addTimesCheckbox = document.getElementById('addTimesCheckbox');
+    const timeFields = document.getElementById('timeFields');
 
+    eventTypeRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this.value === 'specific') {
+                addTimesCheckbox.parentElement.style.display = 'block';
+            } else {
+                addTimesCheckbox.parentElement.style.display = 'none';
+                addTimesCheckbox.checked = false;
+                timeFields.style.display = 'none';
+            }
+        });
+    });
+
+    addTimesCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            timeFields.style.display = 'flex';
+        } else {
+            timeFields.style.display = 'none';
+        }
+    });
+
+    // Initialize visibility based on the default selected radio
+    if (document.querySelector('input[name="eventType"]:checked').value === 'specific') {
+        addTimesCheckbox.parentElement.style.display = 'block';
+    } else {
+        addTimesCheckbox.parentElement.style.display = 'none';
+    }
+}
 window.cancelEventEdit = function() {
     editingEventId = null;
     document.querySelector('#eventForm button[type="submit"]').textContent = 'Create Event';
@@ -1394,7 +1442,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.sidebar').style.transform = 'translateX(0)';
         }
     });
-
+ // Call handleAddTimesCheckbox to set up the event listeners for the "Add Times" checkbox
+ handleAddTimesCheckbox();
     // Add select all members button handler
     document.getElementById('selectAllMembers')?.addEventListener('click', () => {
         document.querySelectorAll('#memberCheckboxes input').forEach(cb => cb.checked = true);

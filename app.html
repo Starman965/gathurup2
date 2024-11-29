@@ -177,6 +177,10 @@
                                         <input type="radio" name="eventType" value="range">
                                         Multi-Day Events
                                     </label>
+                                    <label class="checkbox-label" id="addTimesCheckboxContainer" style="display: none;">
+                                        <input type="checkbox" id="addTimesCheckbox">
+                                        Add Times
+                                    </label>
                                     
                                 </div>
 
@@ -188,39 +192,41 @@
                                                 <label for="specificDateInput">Date</label>
                                                 <input type="date" id="specificDateInput">
                                             </div>
-                                            <div>
-                                                <label for="specificTimeHour">Hour</label>
-                                                <select id="specificTimeHour">
-                                                    <option value="01">01</option>
-                                                    <option value="02">02</option>
-                                                    <option value="03">03</option>
-                                                    <option value="04">04</option>
-                                                    <option value="05">05</option>
-                                                    <option value="06">06</option>
-                                                    <option value="07">07</option>
-                                                    <option value="08" selected>08</option> <!-- Default to 8 -->
-                                                    <option value="09">09</option>
-                                                    <option value="10">10</option>
-                                                    <option value="11">11</option>
-                                                    <option value="12">12</option>
-                                                </select>
+                                            <div id="timeFields" style="display: none;">
+                                                <div class="time-input">
+                                                    <label for="specificTimeHour">H</label>
+                                                    <select id="specificTimeHour">
+                                                        <option value="08" selected>08</option>
+                                                        <option value="09">09</option>
+                                                        <option value="10">10</option>
+                                                        <option value="11">11</option>
+                                                        <option value="12">12</option>
+                                                        <option value="01">01</option>
+                                                        <option value="02">02</option>
+                                                        <option value="03">03</option>
+                                                        <option value="04">04</option>
+                                                        <option value="05">05</option>
+                                                        <option value="06">06</option>
+                                                        <option value="07">07</option>
+                                                    </select>
+                                                </div>
+                                                <div class="time-input">
+                                                    <label for="specificTimeMinute">M</label>
+                                                    <select id="specificTimeMinute">
+                                                        <option value="00">00</option>
+                                                        <option value="15">15</option>
+                                                        <option value="30">30</option>
+                                                    </select>
+                                                </div>
+                                                <div class="time-input">
+                                                    <label for="specificTimePeriod">AM/PM</label>
+                                                    <select id="specificTimePeriod">
+                                                        <option value="AM">AM</option>
+                                                        <option value="PM">PM</option>
+                                                    </select>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label for="specificTimeMinute">Minute</label>
-                                                <select id="specificTimeMinute">
-                                                    <option value="00">00</option>
-                                                    <option value="15">15</option>
-                                                    <option value="30">30</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label for="specificTimePeriod">AM/PM</label>
-                                                <select id="specificTimePeriod">
-                                                    <option value="AM">AM</option>
-                                                    <option value="PM">PM</option>
-                                                </select>
-                                            </div>
-                                            <button type="button" id="addSpecificDateBtn" onclick="addDate()">Add Date</button>
+                                            <button type="button" id="addSpecificDateBtn" class="primary-button" onclick="addDate()">Add Date</button>
                                         </div>
                                     </div>
                                 
@@ -236,7 +242,7 @@
                                                     <label for="endDateInput">End Date</label>
                                                     <input type="date" id="endDateInput">
                                                 </div>
-                                                <button type="button" id="addDateBtn" onclick="addDate()">Add Date Range</button>
+                                                <button type="button" id="addDateBtn" class="primary-button" onclick="addDate()">Add Date Range</button> 
                                             </div>
                                         </div>
                                     </div>
@@ -640,5 +646,6 @@
         });
     });
 </script>
+
 </body>
 </html>

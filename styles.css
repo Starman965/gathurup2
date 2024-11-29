@@ -249,7 +249,7 @@ textarea {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-bottom: 8px; /* Puts space below buttons */
+    margin-bottom: 2px; /* Puts space below buttons */
 }
 
 .primary-button:hover {
@@ -554,6 +554,31 @@ textarea {
     font-weight: 500;
     padding: 16px 0;
     margin-bottom: 16px;
+    font-size: 14px; /* Increase the font size */
+}
+.time-input {
+    display: inline-block;
+    text-align: center;
+    margin-right: 2px; /* Reduce spacing between inputs */
+}
+
+.time-input:last-child {
+    margin-right: 2; /* Remove margin from the last input */
+}
+
+.time-input label {
+    display: block;
+    margin-bottom: 2px; /* Adjust spacing between label and dropdown */
+}
+#timeFields {
+    display: none; /* Hide by default */
+    flex-wrap: wrap;
+    gap: 8px;
+}
+#specificTimeHour,
+#specificTimeMinute,
+#specificTimePeriod {
+    width: 65px; /* Adjust the width as needed */
 }
 
 .back-to-list:hover {
@@ -650,14 +675,9 @@ textarea {
 
 /* Date Selection */
 .date-input {
-    margin: 24px 0;
+    margin: 20px 0;
 }
 
-.date-field-group {
-    display: flex;
-    gap: 16px;
-    align-items: flex-end;
-}
 
 .range-inputs {
     display: flex;
@@ -1367,7 +1387,7 @@ textarea {
 .date-field-row {
     display: flex;
     align-items: flex-end;
-    gap: 24px; /* Increased from 16px to 24px */
+    gap: 8px; /* sets width of date fields */
 }
 
 .date-field-row > div {
@@ -1377,7 +1397,7 @@ textarea {
 .date-field-row button {
     height: 40px;
     white-space: nowrap;
-    margin-left: 15px; /* Added margin to the left of the button */
+    margin-left: 2px; /* Added margin to the left of the button */
 }
 
 .range-inputs .date-field-row > div {
