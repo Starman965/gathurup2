@@ -218,7 +218,6 @@ input[type="date"],
 select,
 textarea {
     width: 100%;
-    max-width: 300px
     padding: 6px;
     border: 2px solid var(--border-color);
     border-radius: 8px;
@@ -1409,6 +1408,12 @@ textarea {
 
     .date-field-row .time-inputs {
         flex-wrap: wrap; /* Allow wrapping on small screens */
+    }
+}
+/* Adjust the width of date input fields for mobile devices */
+@media (max-width: 768px) {
+    .date-field-row input[type="date"] {
+        width: 100%; /* Set the width to 100% of the parent container */
     }
 }
 .date-field-row > div {
