@@ -314,7 +314,7 @@ async function createEvent(e) {
         description: document.getElementById('eventDescription').value,
         type: document.querySelector('input[name="eventType"]:checked').value,
         includeDatePreferences: document.getElementById('includeDatePreferences').checked,
-        includeLocationPreferences: document.getElementById('includeLocationPreferences').checked,
+        includeLocationPreferences: document.getElementById('includeLocationPreferences').checked, // Always read the current state of the checkbox
          dates: selectedDates.map(dateRange => {
             if (dateRange.type === 'dayOfWeek') {
                 return {
@@ -326,7 +326,7 @@ async function createEvent(e) {
             return {
                 start: dateRange.start,
                 end: dateRange.end,
-                time: dateRange.time,
+                time: dateRange.time || null, // Ensure time is always defined
                 displayRange: dateRange.start === dateRange.end ? 
                     formatDateForDisplay(dateRange.start, dateRange.time, document.getElementById('profileTimezone').value) :
                     `${formatDateForDisplay(dateRange.start, '00:00', document.getElementById('profileTimezone').value)} to ${formatDateForDisplay(dateRange.end, '23:59', document.getElementById('profileTimezone').value)}`
@@ -692,8 +692,8 @@ function renderEventsList(events) {
                     </button>
                     <button class="action-button delete" onclick="deleteEvent('${eventId}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"/>
-                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
                         </svg>
                     </button>
                     <button class="action-button share" onclick="copyEventLink('${eventId}')">
@@ -1035,6 +1035,10 @@ window.editEventDates = async function(eventId) {
         // Load existing locations
         selectedLocations = eventData.locations || [];
         renderLocations();
+        
+        // Set includeDatePreferences and includeLocationPreferences checkboxes
+        document.getElementById('includeDatePreferences').checked = eventData.includeDatePreferences || false;
+        document.getElementById('includeLocationPreferences').checked = eventData.includeLocationPreferences || false;
         
         editingEventId = eventId;
         
@@ -1536,21 +1540,27 @@ window.editLocation = editLocation;
 
 function renderEventSettings() {
     const eventSettingsContainer = document.getElementById('eventSettingsContainer');
+    const includeLocationPreferencesCheckbox = document.getElementById('includeLocationPreferences');
+    const includeDatePreferencesCheckbox = document.getElementById('includeDatePreferences');
+
+    const includeLocationPreferences = selectedLocations.length > 0 || (includeLocationPreferencesCheckbox && includeLocationPreferencesCheckbox.checked);
+    const includeDatePreferences = includeDatePreferencesCheckbox && includeDatePreferencesCheckbox.checked;
+
     eventSettingsContainer.innerHTML = `
         <div class="section-card">
             <h3>Group Event Page Settings</h3>
             <div class="form-group">
-                <label>Include These Sections on The Group Event Page:</label>
+                <label>Include on The Group Event Page:</label>
                 <div class="checkbox-grid">
-                    <label class="modern-checkbox">
-                        <input type="checkbox" id="includeDatePreferences" checked>
+                    <label class="checkbox">
+                        <input type="checkbox" id="includeDatePreferences" ${includeDatePreferences ? 'checked' : ''}>
                         <span class="checkmark"></span>
-                        Date Preferences
+                        Date Section
                     </label>
-                    <label class="modern-checkbox">
-                        <input type="checkbox" id="includeLocationPreferences" >
+                    <label class="checkbox">
+                        <input type="checkbox" id="includeLocationPreferences" ${includeLocationPreferences ? 'checked' : ''}>
                         <span class="checkmark"></span>
-                        Location Preferences
+                        Location Section
                     </label>
                 </div>
             </div>

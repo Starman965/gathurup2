@@ -168,7 +168,7 @@
                             <div class="content">
                                 <div class="event-type">
                                     <h3>Find Your Ideal Dates</h3>
-                                    <p class="section-tip">Tip: Choose Single-Day Events to find the best day to meet up. Use Multi-Day Events for offering various date ranges to choose from.</p>
+                                    <p class="section-tip">Tip: Choose Single-Day Events events that happen on a day. Selet Multi-Day Events events that occur over multiple days. Start times can be added to Single-Day events.</p>
                                     <label class="radio-label">
                                         <input type="radio" name="eventType" value="specific" checked>
                                         Single-Day Events
@@ -179,7 +179,7 @@
                                     </label>
                                     <label class="checkbox-label" id="addTimesCheckboxContainer" style="display: none;">
                                         <input type="checkbox" id="addTimesCheckbox">
-                                        Add Times
+                                        Add Start Times
                                     </label>
                                     
                                 </div>
@@ -226,7 +226,7 @@
                                                     </select>
                                                 </div>
                                             </div>
-                                            <button type="button" id="addSpecificDateBtn" class="primary-button add-date-button" onclick="addDate()">Add Date</button>
+                                            <button type="button" id="addSpecificDateBtn" class="primary-button add-date-button" onclick="addDate()">Add Option</button>
                                         </div>
                                     </div>
                                 
@@ -242,7 +242,7 @@
                                                     <label for="endDateInput">End Date</label>
                                                     <input type="date" id="endDateInput">
                                                 </div>
-                                                <button type="button" id="addDateBtn" class="primary-button" onclick="addDate()">Add Date Range</button> 
+                                                <button type="button" id="addDateBtn" class="primary-button" onclick="addDate()">Add Option</button> 
                                             </div>
                                         </div>
                                     </div>
@@ -366,17 +366,6 @@
                             <button type="submit" class="primary-button">Create Event</button>
                         </div>
                     </form>
-
-                    <!--
-                    <div id="shareLink" style="display: none;">
-                        <h3>Share this Event</h3>
-                        <div class="event-link-container">
-                            <input type="text" id="shareLinkInput" readonly>
-                            <button onclick="copyEventLink()" class="copy-button">Copy Link</button>
-                            <button onclick="openEventLink()" class="go-button">Open</button>
-                        </div>
-                    </div>
-                    -->
                 </div>
             </div>
 
@@ -644,6 +633,24 @@
                 }
             });
         });
+
+        // Handle Add Start Times checkbox visibility
+        const addTimesCheckbox = document.getElementById('addTimesCheckbox');
+        const timeFields = document.getElementById('timeFields');
+        addTimesCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                timeFields.style.display = 'flex';
+            } else {
+                timeFields.style.display = 'none';
+            }
+        });
+
+        // Initialize visibility based on the checkbox state
+        if (addTimesCheckbox.checked) {
+            timeFields.style.display = 'flex';
+        } else {
+            timeFields.style.display = 'none';
+        }
     });
 </script>
 

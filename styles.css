@@ -1429,23 +1429,7 @@ textarea {
 .range-inputs .date-field-row > div {
     flex: 1;
 }
-.days-of-week-container {
-    display: flex;
-    align-items: center;
-    gap: 16px; /* Adjust the gap as needed */
-}
 
-.days-of-week-checkboxes {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px; /* Adjust the gap between checkboxes as needed */ 
-}
-
-.days-of-week-checkboxes label {
-    display: flex;
-    align-items: center;
-    gap: 4px; /* Adjust the gap between checkbox and label text as needed */
-}
 .submit-container {
     display: flex;
     gap: 12px;
@@ -1582,32 +1566,4 @@ textarea {
     width: 20px;
     background-color: #eee;
     border-radius: 4px;
-}
-
-.modern-checkbox:hover input ~ .checkmark {
-    background-color: #ccc;
-}
-
-.modern-checkbox input:checked ~ .checkmark {
-    background-color: var(--tiffany-blue);
-}
-
-.checkmark:after {
-    content: "";
-    position: absolute;
-    display: none;
-}
-
-.modern-checkbox input:checked ~ .checkmark:after {
-    display: block;
-}
-
-.modern-checkbox .checkmark:after {
-    left: 7px;
-    top: 3px;
-    width: 6px;
-    height: 12px;
-    border: solid white;
-    border-width: 0 3px 3px 0;
-    transform: rotate(45deg);
 }

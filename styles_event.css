@@ -393,13 +393,13 @@ body {
 }
 
 .trending-date {
-    border: 2px solid #057A55;
+    border: 2px solid #333333;
     background: #DEF7EC;
 }
 
 .vote-button {
-    background: var(--tiffany-blue);
-    color: var(--text-primary);
+    background: #81D8D0; /* Darker background for selected button */
+    color: gray; /* Set text color to gray */
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
     font-weight: 500;
@@ -409,8 +409,8 @@ body {
 }
 
 .vote-button.selected {
-    background: #DEF7EC;
-    color: #057A55;
+    background: #81D8D0; /* Darker background for selected button */
+    color: gray; /* Ensure text color remains gray */
 }
 
 .vote-button:hover {

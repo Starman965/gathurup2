@@ -38,10 +38,9 @@
         <div class="instructions-card">
             <h2>How to Submit Your Preferences</h2>
             <div class="instructions-content">
-                <p>1. Select your timezone above to see times in your local time</p>
-                <p>2. Click each date to expand available time slots</p>
-                <p>3. Click time slots to mark your availability:</p>
-                <p>4. Dates highlighted are trending as the best day</p>
+                <p>1. Double-check your timezone above set the correct local time</p>
+                <p>2. Click each date to expand propsed time slots</p>
+                <p>3. Click time slots to mark your preferences:</p>
                 <div class="availability-legend">
                     <span class="legend-item">
                         <span class="indicator available">✓</span>
@@ -53,7 +52,7 @@
                     </span>
                     <span class="legend-item">
                         <span class="indicator maybe">?</span>
-                        Maybe/No Response
+                        No Response
                     </span>
                 </div>
        
@@ -350,21 +349,21 @@
             const timeSlot = document.querySelector(`.time-slot[data-time-id="${date}T${time}"] .vote-indicator`);
             const currentVote = timeSlot.textContent;
 
-            if (currentVote === '×') {
+            if (currentVote === '?') {
                 timeSlot.textContent = '✓';
                 timeSlot.style.backgroundColor = '#DEF7EC';
                 timeSlot.style.color = '#057A55';
                 votes[`${date}T${time}`] = 'yes';
             } else if (currentVote === '✓') {
-                timeSlot.textContent = '?';
-                timeSlot.style.backgroundColor = '#FEF3C7';
-                timeSlot.style.color = '#D97706';
-                votes[`${date}T${time}`] = 'maybe';
-            } else {
                 timeSlot.textContent = '×';
                 timeSlot.style.backgroundColor = '#FEE2E2';
                 timeSlot.style.color = '#DC2626';
                 votes[`${date}T${time}`] = 'no';
+            } else {
+                timeSlot.textContent = '?';
+                timeSlot.style.backgroundColor = '#FEF3C7';
+                timeSlot.style.color = '#D97706';
+                votes[`${date}T${time}`] = 'maybe';
             }
         };
 
@@ -428,7 +427,7 @@
                                         month: 'long',
                                         day: 'numeric'
                                     })}</h3>
-                                    <p>${dateObj.times.length} time slots available</p>
+                                    <p>${dateObj.times.length} time slots proposed</p>
                                 </div>
                             </div>
                             <svg class="expand-icon" viewBox="0 0 24 24">
@@ -491,7 +490,7 @@
                             <div class="vote-indicator" style="background-color: #FEF3C7; color: #D97706;">?</div>
                             <div class="time-info">
                                 <p class="time">${time}</p>
-                                <p class="votes">${availableCount} people available</p>
+                                <p class="votes">${availableCount} person(s) selected this time</p>
                             </div>
                         </div>
                     </button>
