@@ -250,6 +250,7 @@ textarea {
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 2px; /* Puts space below buttons */
+    font-size: 18px /* text size for the main button
 }
 
 .primary-button:hover {
