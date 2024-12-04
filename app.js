@@ -1444,6 +1444,40 @@ document.addEventListener('DOMContentLoaded', () => {
     });
  // Call handleAddTimesCheckbox to set up the event listeners for the "Add Times" checkbox
  handleAddTimesCheckbox();
+
+ document.addEventListener('DOMContentLoaded', () => {
+    const collapsibles = document.querySelectorAll('.collapsible');
+    collapsibles.forEach(collapsible => {
+        collapsible.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const content = this.nextElementSibling;
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+            } else {
+                content.style.display = 'block';
+            }
+        });
+    });
+
+    // Handle Add Start Times checkbox visibility
+    const addTimesCheckbox = document.getElementById('addTimesCheckbox');
+    const timeFields = document.getElementById('timeFields');
+    addTimesCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            timeFields.style.display = 'flex';
+        } else {
+            timeFields.style.display = 'none';
+        }
+    });
+
+    // Initialize visibility based on the checkbox state
+    if (addTimesCheckbox.checked) {
+        timeFields.style.display = 'flex';
+    } else {
+        timeFields.style.display = 'none';
+    }
+});
+
     // Add select all members button handler
     document.getElementById('selectAllMembers')?.addEventListener('click', () => {
         document.querySelectorAll('#memberCheckboxes input').forEach(cb => cb.checked = true);
