@@ -120,7 +120,7 @@ body {
 
 .instructions-content {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var (--text-secondary);
 }
 
 .availability-legend {
@@ -491,3 +491,191 @@ body {
         flex: 1 1 calc(50% - 1rem);
     }
 }
+
+/* ...existing code... */
+.no-dates,
+.no-locations {
+    text-align: center;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin: 1rem 0;
+}
+
+/* ...existing code... */
+
+.month-group {
+    background: white;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+}
+
+.month-header {
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background: #F9FAFB;
+}
+
+.month-header:hover {
+    background: #F3F4F6;
+}
+
+.date-ranges {
+    padding: 0.5rem;
+}
+
+.range-card {
+    width: 100%;
+    padding: 0.75rem;  /* Reduced padding */
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.range-card .time-slot-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-height: 2.5rem;  /* Set consistent height */
+}
+
+.range-card .time-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.range-card .time-info .time {
+    font-size: 0.875rem;  /* Slightly smaller text */
+    margin-bottom: 0.125rem;
+}
+
+.range-card .time-info .votes {
+    font-size: 0.75rem;  /* Smaller hint text */
+    margin-top: 0;
+}
+
+.range-card:last-child {
+    border-bottom: none;
+}
+
+.date-range-indicator {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+/* ...existing code... */
+
+.range-card .time-info {
+    flex: 1;
+    text-align: left;
+}
+
+.range-card .time-info .time {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.range-card .time-info .votes {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ...existing code... */
+
+.month-header-content {
+    flex: 1;
+}
+
+.expand-hint {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    display: block;
+    margin-top: 0.25rem;
+    font-weight: normal;
+}
+
+.date-details .expand-hint {
+    font-size: 0.75rem;
+    color: var(--tiffany-blue);
+}
+
+/* Date Vote Button */
+.date-vote-button {
+    padding: 0.5rem;
+    border: none;
+    background: none;
+    cursor: pointer;
+    border-radius: 0.375rem;
+}
+
+/* Location Vote Button */
+.location-vote-button {
+    background: #81D8D0;
+    color: gray;
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.location-vote-button.selected {
+    background: #81D8D0;
+    color: gray;
+}
+
+.location-vote-button:hover {
+    background: var(--tiffany-blue-hover);
+}
+
+/* ...rest of existing code... */
+
+/* ...existing code... */
+
+.date-card.single-date {
+    display: flex;
+    flex-direction: column;
+}
+
+.date-card.single-date .content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 1rem 1rem 0.5rem;
+    cursor: pointer;
+}
+
+.date-card.single-date .date-info {
+    flex: 1;
+}
+
+.date-card.single-date .vote-button {
+    background: none;
+    padding: 0;
+    margin-left: 1rem;
+}
+
+.date-card.single-date .vote-indicator {
+    width: 2rem;
+    height: 2rem;
+}
+
+.date-card.single-date .hint-text {
+    font-size: 0.75rem;
+    color: var(--tiffany-blue);
+    padding: 0 0 0.5rem 4.5rem; /* Align with date text (date badge width + gap) */
+    margin: 0;
+}
+
+/* ...rest of existing code... */

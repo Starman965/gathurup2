@@ -36,11 +36,9 @@
 
         <!-- Instructions Card -->
         <div class="instructions-card">
-            <h2>How to Submit Your Preferences</h2>
+            <h2>Click on the icon to cycle through your preferences</h2>
             <div class="instructions-content">
-                <p>1. Double-check your timezone above set the correct local time</p>
-                <p>2. Click each date to expand propsed time slots</p>
-                <p>3. Click time slots to mark your preferences:</p>
+                <p>Choose one of the following for each option presented</p>
                 <div class="availability-legend">
                     <span class="legend-item">
                         <span class="indicator available">✓</span>
@@ -182,6 +180,12 @@
                 if (event.includeDatePreferences) {
                     document.getElementById('datePreferencesSection').style.display = 'block';
                     document.getElementById('responseSummaryCard').style.display = 'block';
+                    if (event.dates.length === 0) {
+                        document.getElementById('datesList').innerHTML = '<p class="no-dates">No Dates Provided</p>';
+                    } else {
+                        const dates = consolidateAndSortDates(event.dates);
+                        await renderDatesList(dates, userId, eventId);
+                    }
                 } else {
                     document.getElementById('datePreferencesSection').style.display = 'none';
                     document.getElementById('responseSummaryCard').style.display = 'none';
@@ -190,6 +194,11 @@
                 // Show or hide location preferences section
                 if (event.includeLocationPreferences) {
                     document.getElementById('locationPreferencesSection').style.display = 'block';
+                    if (event.locations.length === 0) {
+                        document.getElementById('locationPreferencesContainer').innerHTML = '<p class="no-locations">No Locations Provided</p>';
+                    } else {
+                        await renderLocationPreferences(event.locations, userId, eventId);
+                    }
                 } else {
                     document.getElementById('locationPreferencesSection').style.display = 'none';
                 }
@@ -220,6 +229,24 @@
             } catch (error) {
                 console.error('Error loading event data:', error);
             }
+        }
+
+        function consolidateAndSortDates(dates) {
+            const datesMap = dates.reduce((acc, dateObj) => {
+                const dateKey = dateObj.start;
+                if (!acc[dateKey]) {
+                    acc[dateKey] = {
+                        date: dateObj.start,
+                        times: []
+                    };
+                }
+                if (dateObj.time) {
+                    acc[dateKey].times.push(dateObj.time);
+                }
+                return acc;
+            }, {});
+
+            return Object.values(datesMap).sort((a, b) => new Date(a.date) - new Date(b.date));
         }
 
         async function renderResponseSummary(totalMembers, userId, eventId) {
@@ -258,7 +285,7 @@
                         <h3 class="location-title">${location.name}</h3>
                         <p class="location-description">${location.description}</p>
                         <div class="vote-buttons">
-                            <button class="${buttonClass}" id="vote-button-${index}" onclick="voteLocation('${location.name}')">
+                            <button class="${buttonClass} location-vote-button" id="vote-button-${index}" onclick="voteLocation('${location.name}')">
                                 ${buttonText}
                             </button>
                         </div>
@@ -269,12 +296,12 @@
         }
 
         window.voteLocation = function(locationName) {
-            document.querySelectorAll('.vote-button').forEach(button => {
+            document.querySelectorAll('.location-vote-button').forEach(button => {
                 button.classList.remove('selected');
                 button.textContent = "Select Your Preference"; // Update text for non-selected buttons
             });
 
-            const selectedButton = document.querySelector(`.vote-button[onclick="voteLocation('${locationName}')"]`);
+            const selectedButton = document.querySelector(`.location-vote-button[onclick="voteLocation('${locationName}')"]`);
             selectedButton.classList.add('selected');
             selectedButton.textContent = "My Preference"; // Update text for selected button
 
@@ -337,33 +364,40 @@
 
         window.toggleDate = function(date) {
             const dateCard = document.querySelector(`.date-card[data-date="${date}"]`);
-            const timeSlots = dateCard.querySelector('.time-slots');
+            const dateRanges = dateCard.querySelector('.date-ranges');
             const expandIcon = dateCard.querySelector('.expand-icon');
-            const isExpanded = timeSlots.style.display === 'block';
-
-            timeSlots.style.display = isExpanded ? 'none' : 'block';
-            expandIcon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+            
+            if (dateRanges) {
+                const isExpanded = dateRanges.style.display === 'block';
+                dateRanges.style.display = isExpanded ? 'none' : 'block';
+                if (expandIcon) {
+                    expandIcon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+                }
+            }
         };
 
         window.toggleVote = function(date, time) {
-            const timeSlot = document.querySelector(`.time-slot[data-time-id="${date}T${time}"] .vote-indicator`);
-            const currentVote = timeSlot.textContent;
-
-            if (currentVote === '?') {
-                timeSlot.textContent = '✓';
-                timeSlot.style.backgroundColor = '#DEF7EC';
-                timeSlot.style.color = '#057A55';
-                votes[`${date}T${time}`] = 'yes';
-            } else if (currentVote === '✓') {
-                timeSlot.textContent = '×';
-                timeSlot.style.backgroundColor = '#FEE2E2';
-                timeSlot.style.color = '#DC2626';
-                votes[`${date}T${time}`] = 'no';
-            } else {
-                timeSlot.textContent = '?';
-                timeSlot.style.backgroundColor = '#FEF3C7';
-                timeSlot.style.color = '#D97706';
-                votes[`${date}T${time}`] = 'maybe';
+            const timeSlotId = time ? `${date}T${time}` : date;
+            const indicator = document.querySelector(`[data-time-id="${timeSlotId}"] .vote-indicator`) || 
+                             document.querySelector(`[data-date="${date}"] .vote-indicator`);
+            
+            if (indicator) {
+                const currentVote = votes[timeSlotId] || 'maybe';
+                let newVote;
+                
+                switch (currentVote) {
+                    case 'maybe':
+                        newVote = 'yes';
+                        break;
+                    case 'yes':
+                        newVote = 'no';
+                        break;
+                    default:
+                        newVote = 'maybe';
+                }
+                
+                votes[timeSlotId] = newVote;
+                updateVoteIndicatorDisplay(indicator, newVote);
             }
         };
 
@@ -397,58 +431,220 @@
             populateTimezoneSelect();
         });
 
+    
+        // Add this new helper function
+        function updateVoteIndicatorDisplay(indicator, vote) {
+            switch (vote) {
+                case 'yes':
+                    indicator.textContent = '✓';
+                    indicator.style.backgroundColor = '#DEF7EC';
+                    indicator.style.color = '#057A55';
+                    break;
+                case 'no':
+                    indicator.textContent = '×';
+                    indicator.style.backgroundColor = '#FEE2E2';
+                    indicator.style.color = '#DC2626';
+                    break;
+                default:
+                    indicator.textContent = '?';
+                    indicator.style.backgroundColor = '#FEF3C7';
+                    indicator.style.color = '#D97706';
+            }
+        }
+
         async function renderDatesList(dates, userId, eventId) {
             const container = document.getElementById('datesList');
-            let maxAvailableCount = 0;
-            let trendingDates = [];
+            const eventRef = ref(database, `users/${userId}/events/${eventId}`);
+            const eventSnap = await get(eventRef);
+            const event = eventSnap.val();
 
-            const dateCards = await Promise.all(dates.map(async dateObj => {
-                const timesHtml = await renderTimeSlots(dateObj.times, dateObj.date, userId, eventId);
-                const availableCount = await getTotalAvailableCount(dateObj.times, dateObj.date, userId, eventId);
+            // Load existing votes for current user
+            const userVotesRef = ref(database, `users/${userId}/events/${eventId}/votes/${selectedFullName}/datePreferences`);
+            const userVotesSnap = await get(userVotesRef);
+            const userVotes = userVotesSnap.val() || {};
 
-                if (availableCount > maxAvailableCount) {
-                    maxAvailableCount = availableCount;
-                    trendingDates = [dateObj.date];
-                } else if (availableCount === maxAvailableCount) {
-                    trendingDates.push(dateObj.date);
+            const getVoteIndicator = (dateId) => {
+                const vote = userVotes[dateId];
+                let symbol = '?', bgColor = '#FEF3C7', textColor = '#D97706';
+                
+                if (vote === 'yes') {
+                    symbol = '✓';
+                    bgColor = '#DEF7EC';
+                    textColor = '#057A55';
+                } else if (vote === 'no') {
+                    symbol = '×';
+                    bgColor = '#FEE2E2';
+                    textColor = '#DC2626';
                 }
+                
+                return `<div class="vote-indicator" style="background-color: ${bgColor}; color: ${textColor};">${symbol}</div>`;
+            };
 
-                return `
-                    <div class="date-card" data-date="${dateObj.date}">
-                        <button class="date-header" onclick="toggleDate('${dateObj.date}')">
+            let html = '';
+
+            if (event.type === 'range') {
+                // Group dates by month/year for range events
+                const monthGroups = {};
+                event.dates.forEach(dateObj => {
+                    const startDate = new Date(dateObj.start);
+                    const monthKey = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+                    if (!monthGroups[monthKey]) monthGroups[monthKey] = [];
+                    monthGroups[monthKey].push(dateObj);
+                });
+
+                html = Object.entries(monthGroups).map(([month, ranges]) => `
+                    <div class="month-group">
+                        <div class="month-header" onclick="toggleMonth('${month}')">
+                            <div class="month-header-content">
+                                <h3>${month}</h3>
+                                <span class="expand-hint">Click to see ${ranges.length} date range${ranges.length > 1 ? 's' : ''}</span>
+                            </div>
+                            <svg class="expand-icon" viewBox="0 0 24 24">
+                                <path d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </div>
+                        <div class="date-ranges" id="month-${month.replace(/\s+/g, '-')}" style="display: none;">
+                            ${ranges.map(dateObj => `
+                                <div class="range-card" data-date="${dateObj.start}">
+                                    <div class="time-slot-content">
+                                        <button class="date-vote-button" onclick="toggleSingleDateVote('${dateObj.start}')">
+                                            <div class="vote-indicator" data-vote-id="${dateObj.start}">?</div>
+                                        </button>
+                                        <div class="time-info">
+                                            <p class="time">${new Date(dateObj.start).toLocaleDateString('en-US', { 
+                                                weekday: 'short',
+                                                month: 'short', 
+                                                day: 'numeric'
+                                            })} - ${new Date(dateObj.end).toLocaleDateString('en-US', { 
+                                                weekday: 'short',
+                                                month: 'short', 
+                                                day: 'numeric'
+                                            })}</p>
+                                            <p class="votes">Click the icon to set your perference</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `).join('');
+            } else if (!event.dates.some(d => d.time)) {
+                // Single dates without time slots
+                html = event.dates.map(dateObj => `
+                    <div class="date-card single-date" data-date="${dateObj.start}">
+                        <div class="content-wrapper">
                             <div class="date-info">
                                 <div class="date-badge">
-                                    <span class="month">${new Date(dateObj.date).toLocaleDateString('en-US', { month: 'short' })}</span>
-                                    <span class="day">${new Date(dateObj.date).getDate()}</span>
+                                    <span class="month">${new Date(dateObj.start).toLocaleDateString('en-US', { month: 'short' })}</span>
+                                    <span class="day">${new Date(dateObj.start).getDate()}</span>
                                 </div>
                                 <div class="date-details">
-                                    <h3>${new Date(dateObj.date).toLocaleDateString('en-US', { 
-                                        weekday: 'long',
-                                        month: 'long',
-                                        day: 'numeric'
-                                    })}</h3>
-                                    <p>${dateObj.times.length} time slots proposed</p>
+                                    <h3>${new Date(dateObj.start).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h3>
+                                    
+                                </div>
+                            </div>
+                            <button class="date-vote-button" onclick="toggleSingleDateVote('${dateObj.start}')">
+                                <div class="vote-indicator" data-vote-id="${dateObj.start}">${getVoteIndicator(dateObj.start)}</div>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                // Dates with time slots
+                html = event.dates.map(dateObj => `
+                    <div class="date-card" data-date="${dateObj.start}">
+                        <div class="month-header" onclick="toggleDate('${dateObj.start}')">
+                            <div class="month-header-content">
+                                <div class="date-info">
+                                    <div class="date-badge">
+                                        <span class="month">${new Date(dateObj.start).toLocaleDateString('en-US', { month: 'short' })}</span>
+                                        <span class="day">${new Date(dateObj.start).getDate()}</span>
+                                    </div>
+                                    <div class="date-details">
+                                        <h3>${new Date(dateObj.start).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h3>
+                                        <span class="expand-hint">Click to see time slot(s)</span>
+                                    </div>
                                 </div>
                             </div>
                             <svg class="expand-icon" viewBox="0 0 24 24">
                                 <path d="M19 9l-7 7-7-7" />
                             </svg>
-                        </button>
-                        <div class="time-slots" style="display: none;">
-                            ${timesHtml}
+                        </div>
+                        <div class="date-ranges" style="display: none;">
+                            <div class="time-slot" data-time-id="${dateObj.start}T${dateObj.time}">
+                                <div class="time-slot-content">
+                                    <button class="date-vote-button" onclick="toggleTimeSlotVote('${dateObj.start}', '${dateObj.time}')">
+                                        ${getVoteIndicator(`${dateObj.start}T${dateObj.time}`)}
+                                    </button>
+                                    <div class="time-info">
+                                        <p class="time">${formatTime(dateObj.time)}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                `;
-            }));
+                `).join('');
+            }
 
-            container.innerHTML = dateCards.join('');
+            container.innerHTML = html;
+        }
 
-            trendingDates.forEach(trendingDate => {
-                const trendingDateCard = document.querySelector(`.date-card[data-date="${trendingDate}"]`);
-                if (trendingDateCard) {
-                    trendingDateCard.classList.add('trending-date');
-                }
-            });
+        // Add these new vote handling functions
+        window.toggleSingleDateVote = function(date) {
+            const indicator = document.querySelector(`[data-vote-id="${date}"]`);
+            if (!indicator) return;
+            
+            const currentVote = votes[date] || 'maybe';
+            let newVote;
+            
+            switch (currentVote) {
+                case 'maybe':
+                    newVote = 'yes';
+                    break;
+                case 'yes':
+                    newVote = 'no';
+                    break;
+                default:
+                    newVote = 'maybe';
+            }
+            
+            votes[date] = newVote;
+            updateVoteIndicatorDisplay(indicator, newVote);
+            
+            // Prevent event from bubbling up to parent elements
+            event.stopPropagation();
+        };
+
+        window.toggleTimeSlotVote = function(date, time) {
+            const timeSlotId = `${date}T${time}`;
+            const indicator = document.querySelector(`.time-slot[data-time-id="${timeSlotId}"] .vote-indicator`);
+            updateVoteIndicator(indicator);
+            votes[timeSlotId] = getVoteValue(indicator.textContent);
+        };
+
+        function updateVoteIndicator(indicator) {
+            const currentSymbol = indicator.textContent;
+            if (currentSymbol === '?') {
+                indicator.textContent = '✓';
+                indicator.style.backgroundColor = '#DEF7EC';
+                indicator.style.color = '#057A55';
+            } else if (currentSymbol === '✓') {
+                indicator.textContent = '×';
+                indicator.style.backgroundColor = '#FEE2E2';
+                indicator.style.color = '#DC2626';
+            } else {
+                indicator.textContent = '?';
+                indicator.style.backgroundColor = '#FEF3C7';
+                indicator.style.color = '#D97706';
+            }
+        }
+
+        function getVoteValue(symbol) {
+            switch (symbol) {
+                case '✓': return 'yes';
+                case '×': return 'no';
+                default: return 'maybe';
+            }
         }
 
         async function getTotalAvailableCount(times, date, userId, eventId) {
@@ -469,6 +665,22 @@
         }
 
         async function renderTimeSlots(times, date, userId, eventId) {
+            if (times.length === 0) {
+                return `
+                    <button class="time-slot" 
+                            onclick="toggleVote('${date}', '')"
+                            data-time-id="${date}">
+                        <div class="time-slot-content">
+                            <div class="vote-indicator" style="background-color: #FEF3C7; color: #D97706;">?</div>
+                            <div class="time-info">
+                                <p class="time">All Day</p>
+                                <p class="votes">0 person(s) selected this time</p>
+                            </div>
+                        </div>
+                    </button>
+                `;
+            }
+
             const timesHtml = await Promise.all(times.map(async time => {
                 const timeSlotId = `${date}T${time}`;
                 const votesRef = ref(database, `users/${userId}/events/${eventId}/votes`);
@@ -489,7 +701,7 @@
                         <div class="time-slot-content">
                             <div class="vote-indicator" style="background-color: #FEF3C7; color: #D97706;">?</div>
                             <div class="time-info">
-                                <p class="time">${time}</p>
+                                <p class="time">${formatTime(time)}</p>
                                 <p class="votes">${availableCount} person(s) selected this time</p>
                             </div>
                         </div>
@@ -497,6 +709,21 @@
                 `;
             }));
             return timesHtml.join('');
+        }
+
+        function formatTime(time) {
+            try {
+                const [hours, minutes] = time.split(':');
+                const date = new Date();
+                date.setHours(parseInt(hours), parseInt(minutes));
+                return date.toLocaleTimeString('en-US', { 
+                    hour: 'numeric', 
+                    minute: '2-digit',
+                    hour12: true 
+                });
+            } catch (e) {
+                return time; // Fallback to original format if parsing fails
+            }
         }
 
         function populateTimezoneSelect() {
@@ -518,6 +745,15 @@
                 timezoneSelect.appendChild(option);
             });
         }
+
+        // Add/update the toggle month function
+        window.toggleMonth = function(month) {
+            const monthContent = document.getElementById(`month-${month.replace(/\s+/g, '-')}`);
+            const isExpanded = monthContent.style.display === 'block';
+            monthContent.style.display = isExpanded ? 'none' : 'block';
+            const icon = monthContent.parentElement.querySelector('.expand-icon');
+            icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+        };
 
     </script>
 
