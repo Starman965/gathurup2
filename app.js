@@ -556,7 +556,7 @@ function renderLocations() {
 
 
 // Date Management Functions
-function addDate() {
+window.addDate = function() {
     const specificDateInput = document.getElementById('specificDateInput');
     const specificTimeHour = document.getElementById('specificTimeHour').value;
     const specificTimeMinute = document.getElementById('specificTimeMinute').value;
@@ -579,6 +579,10 @@ function addDate() {
     }
 
     if (eventType === 'specific' && specificDateInput.value) {
+        if (addTimesCheckbox.checked && !specificTime) {
+            alert('Please add a time for the single-day event.');
+            return;
+        }
         selectedDates.push({
             start: specificDateInput.value,
             end: specificDateInput.value,
@@ -590,7 +594,7 @@ function addDate() {
             start: startDateInput.value,
             end: endDateInput.value,
             time: null,
-            displayRange: `${formatDateForDisplay(startDateInput.value, '00:00', timezone)} to ${formatDateForDisplay(endDateInput.value, '23:59', timezone)}`
+            displayRange: `${formatDateForDisplay(startDateInput.value, null, timezone)} to ${formatDateForDisplay(endDateInput.value, null, timezone)}`
         });
     }
 
@@ -602,7 +606,6 @@ function handleEventTypeChange() {
     const specificDateSection = document.getElementById('specificDateSection');
     const rangeDateSection = document.getElementById('rangeDateSection');
 
-    // Hide all sections first
     specificDateSection.style.display = 'none';
     rangeDateSection.style.display = 'none';
    
@@ -622,19 +625,42 @@ function handleEventTypeChange() {
 function renderDates() {
     const datesList = document.getElementById('datesList');
     const timezone = document.getElementById('profileTimezone').value;
+
+    // Sort dates in date order
+    selectedDates.sort((a, b) => new Date(a.start) - new Date(b.start));
+
     datesList.innerHTML = selectedDates.map((date, index) => {
-        const displayText = date.type === 'dayOfWeek' 
-            ? `Days: ${date.days.join(', ')}`
-            : (date.start === date.end 
-                ? formatDateForDisplay(date.start, date.time, timezone)
-                : `${formatDateForDisplay(date.start, '00:00', timezone)} to ${formatDateForDisplay(date.end, '23:59', timezone)}`);
+        const displayText = date.start === date.end 
+            ? formatDateForDisplay(date.start, date.time, timezone)
+            : `${formatDateForDisplay(date.start, null, timezone)} to ${formatDateForDisplay(date.end, null, timezone)}`;
         return `
-            <div class="date-tag">
-                ${displayText}
-                <button onclick="removeDate('${date.start}', '${date.end}')">x</button>
+            <div class="date-row" data-index="${index}">
+                <span class="date-display">${displayText}</span>
+                <button class="action-button delete" onclick="removeDate(${index})">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6l-2 14H7L5 6"></path>
+                        <path d="M10 11v6"></path>
+                        <path d="M14 11v6"></path>
+                        <path d="M5 6l1-3h12l1 3"></path>
+                    </svg>
+                </button>
             </div>
         `;
     }).join('');
+}
+
+async function removeDate(index) {
+    if (confirm('Are you sure you want to delete this date? This action cannot be undone.')) {
+        selectedDates.splice(index, 1);
+        renderDates();
+
+        // Update database if editing an event
+        if (editingEventId) {
+            const eventRef = ref(database, `${getUserRef()}/events/${editingEventId}/dates`);
+            await set(eventRef, selectedDates);
+        }
+    }
 }
 
 // Event Listing and Detail Functions
@@ -1210,8 +1236,11 @@ function renderPeople(people) {
             <span>${person.firstName} ${person.lastName}</span>
             <button onclick="deletePerson('${id}')" class="action-button">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"/>
-                    <line x1="6" y1="6" x2="18" y2="18"/>
+                     <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6l-2 14H7L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                    <path d="M5 6l1-3h12l1 3"></path>
                 </svg>
             </button>
         </div>
@@ -1297,8 +1326,11 @@ function renderTribes(tribes, people) {
                     </button>
                     <button class="action-button delete" onclick="deleteTribe('${id}')">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"/>
-                            <line x1="6" y1="6" x2="18" y2="18"/>
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6l-2 14H7L5 6"></path>
+                    <path d="M10 11v6"></path>
+                    <path d="M14 11v6"></path>
+                    <path d="M5 6l1-3h12l1 3"></path>
                         </svg>
                     </button>
                 </div>
@@ -1580,16 +1612,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Attach necessary functions to window object for HTML access
-window.addDate = addDate;
-window.removeDate = function(startDate, endDate) {
-    selectedDates = selectedDates.filter(date => !(date.start === startDate && date.end === endDate));
-    renderDates();
+5
+window.removeDate = async function(index) {
+    if (confirm('Are you sure you want to delete this date? This action cannot be undone.')) {
+        selectedDates.splice(index, 1);
+        renderDates();
+
+        // Update database if editing an event
+        if (editingEventId) {
+            const eventRef = ref(database, `${getUserRef()}/events/${editingEventId}/dates`);
+            await set(eventRef, selectedDates);
+        }
+    }
 };
 window.showEventsList = showEventsList;
 window.showEventDetail = showEventDetail;
 // Make switchTab available globally
 window.switchTab = switchTab;
 window.addLocation = addLocation;
+window.addDate = addDate
 window.deleteLocation = deleteLocation;
 window.resetLocationForm = resetLocationForm;
 window.updateLocation = updateLocation;
@@ -1607,7 +1648,7 @@ function renderEventSettings() {
         <div class="section-card">
             <h3>Group Event Page Settings</h3>
             <div class="form-group">
-                <label>Include on The Group Event Page:</label>
+                <label>Include on Group Event Page:</label>
                 <div class="checkbox-grid">
                     <label class="checkbox">
                         <input type="checkbox" id="includeDatePreferences" ${includeDatePreferences ? 'checked' : ''}>

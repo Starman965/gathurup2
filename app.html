@@ -11,6 +11,23 @@
     <meta name="author" content="Tiffanie and David Lewis">
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="app.js"></script>
+    <style>
+        .date-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .date-display {
+            flex-grow: 1;
+        }
+        .action-button.delete {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     
@@ -168,7 +185,7 @@
                             <div class="content">
                                 <div class="event-type">
                                     <h3>Find Your Ideal Dates</h3>
-                                    <p class="section-tip">Tip: Choose Single-Day Events events that happen on a day. Selet Multi-Day Events events that occur over multiple days. Start times can be added to Single-Day events.</p>
+                                    <p class="section-tip">Tip: Choose Single-Day Events for events that happen within a day. Selet Multi-Day Events for events that occur over multiple days. Start times can only be added to Single-Day events.</p>
                                     <label class="radio-label">
                                         <input type="radio" name="eventType" value="specific" checked>
                                         Single-Day Events
@@ -249,7 +266,9 @@
                             
                                 </div>
 
-                                <div id="datesList" class="dates-list"></div>
+                                <div id="datesList" class="dates-list">
+                                    <!-- This will be populated dynamically by JavaScript -->
+                                </div>
                             </div>
                             
                         </div>
