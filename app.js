@@ -1,4 +1,4 @@
-// app.js
+// app.js 12/4/2024
 import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { 
