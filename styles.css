@@ -250,12 +250,22 @@ textarea {
     cursor: pointer;
     transition: all 0.2s ease;
     margin-bottom: 2px; /* Puts space below buttons */
+    width: auto; /* Ensure buttons do not take full width */
 }
 
 .primary-button:hover {
     background: #6BC0B8;
 }
 
+/* Handles "Add Option" button */
+.primary-button.add-date-button {
+    font-size: 16px; /* Adjust the font size as needed */
+}
+
+/* Handles "Add Location" button */
+.primary-button.add-location-button {
+    font-size: 16px; /* Adjust the font size as needed */
+}
 .secondary-button {
     height: 40px;
     padding: 8px 24px;
