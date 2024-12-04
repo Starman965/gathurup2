@@ -1392,14 +1392,12 @@ function updateUserProfile(user) {
 // Initialize App
 document.addEventListener('DOMContentLoaded', () => {
     // Add authentication event listeners
-    const googleLoginBtn = document.getElementById('googleLoginBtn');
     const emailLoginBtn = document.getElementById('emailLoginBtn');
     const emailLoginSubmitBtn = document.getElementById('emailLoginSubmitBtn');
     const emailSignupBtn = document.getElementById('emailSignupBtn');
     const logoutBtn = document.getElementById('logoutBtn');
     const showSignupBtn = document.getElementById('showSignupBtn');
 
-    googleLoginBtn?.addEventListener('click', loginWithGoogle);
     emailLoginBtn?.addEventListener('click', () => switchTab('login'));
     emailLoginSubmitBtn?.addEventListener('click', loginWithEmail);
     emailSignupBtn?.addEventListener('click', signupWithEmail);
@@ -1412,12 +1410,27 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('tribeForm')?.addEventListener('submit', createTribe);
     document.getElementById('profileForm')?.addEventListener('submit', updateProfileInfo);
     
+    // Add collapsible event listeners
+    const collapsibles = document.querySelectorAll('.collapsible');
+    collapsibles.forEach(collapsible => {
+        collapsible.addEventListener('click', function() {
+            this.classList.toggle('active');
+            const content = this.nextElementSibling;
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+            } else {
+                content.style.display = 'block';
+            }
+        });
+    });
+
     // Add date input event listeners
     const startDateInput = document.getElementById('startDateInput');
     const endDateInput = document.getElementById('endDateInput');
+    const specificDateInput = document.getElementById('specificDateInput');
 
     [startDateInput, endDateInput, specificDateInput].forEach(input => {
-        input.addEventListener('change', handleEventTypeChange);
+        input?.addEventListener('change', handleEventTypeChange);
     });
 
     // Add event type radio listeners
@@ -1442,8 +1455,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.sidebar').style.transform = 'translateX(0)';
         }
     });
- // Call handleAddTimesCheckbox to set up the event listeners for the "Add Times" checkbox
- handleAddTimesCheckbox();
 
  document.addEventListener('DOMContentLoaded', () => {
     const collapsibles = document.querySelectorAll('.collapsible');
@@ -1477,7 +1488,10 @@ document.addEventListener('DOMContentLoaded', () => {
         timeFields.style.display = 'none';
     }
 });
+ // Call handleAddTimesCheckbox to set up the event listeners for the "Add Times" checkbox
+ handleAddTimesCheckbox();
 
+ 
     // Add select all members button handler
     document.getElementById('selectAllMembers')?.addEventListener('click', () => {
         document.querySelectorAll('#memberCheckboxes input').forEach(cb => cb.checked = true);
