@@ -831,10 +831,26 @@ eventData.tribeInfo.size = eventData.tribeInfo.members.length;
 
 function renderVotesSummary(eventData) {
     const votes = eventData.votes || {};
+    const tribeMembers = eventData.tribeInfo.size || 0;
+
     return eventData.dates.map(date => {
-        const dateKey = `${date.start}T${date.time}`;
-        const yesVotes = Object.values(votes).filter(vote => vote.datePreferences[dateKey] === 'yes').length;
-        const noVotes = Object.values(votes).filter(vote => vote.datePreferences[dateKey] === 'no').length;
+        const dateKey = date.time ? 
+            `${date.start}T${date.time}` : 
+            `${date.start}`;
+        
+        const yesVotes = Object.values(votes).filter(vote => 
+            vote.datePreferences && vote.datePreferences[dateKey] === 'yes'
+        ).length;
+        
+        const noVotes = Object.values(votes).filter(vote => 
+            vote.datePreferences && vote.datePreferences[dateKey] === 'no'
+        ).length;
+
+        const maybeVotes = Object.values(votes).filter(vote => 
+            vote.datePreferences && vote.datePreferences[dateKey] === 'maybe'
+        ).length;
+
+        const noResponseCount = tribeMembers - (yesVotes + noVotes + maybeVotes);
 
         return `
             <div class="vote-card">
@@ -854,6 +870,13 @@ function renderVotesSummary(eventData) {
                         </svg>
                         ${noVotes}
                     </div>
+                    <div class="stat-item no-response">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M8 12h8"/>
+                        </svg>
+                        ${noResponseCount}
+                    </div>
                 </div>
             </div>
         `;
@@ -862,20 +885,31 @@ function renderVotesSummary(eventData) {
 
 function renderLocationVotesSummary(eventData) {
     const votes = eventData.votes || {};
-    return eventData.locations.map(location => {
-        const locationKey = location.name;
-        const locationVotes = Object.values(votes).filter(vote => vote.locationPreferences.selectedLocation === locationKey).length;
+    const locationVotes = {};
 
+    // Count votes for each location
+    Object.values(votes).forEach(vote => {
+        if (vote.locationPreferences && vote.locationPreferences.selectedLocation) {
+            const location = vote.locationPreferences.selectedLocation;
+            locationVotes[location] = (locationVotes[location] || 0) + 1;
+        }
+    });
+
+    return eventData.locations.map(location => {
+        const voteCount = locationVotes[location.name] || 0;
         return `
             <div class="vote-card">
-                <div class="vote-location">${location.name}</div>
+                <div class="vote-location">
+                    <div class="location-name">${location.name}</div>
+                    ${location.description ? `<div class="location-description">${location.description}</div>` : ''}
+                </div>
                 <div class="vote-stats">
                     <div class="stat-item total-votes">
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
                             <polyline points="22 4 12 14.01 9 11.01"/>
                         </svg>
-                        ${locationVotes}
+                        ${voteCount}
                     </div>
                 </div>
             </div>
