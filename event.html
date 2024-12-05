@@ -338,7 +338,7 @@
                             timeSlot.textContent = '✓';
                             timeSlot.style.backgroundColor = '#DEF7EC';
                             timeSlot.style.color = '#057A55';
-                        } else if (vote === 'maybe') {
+                        } else if (vote === 'no response') {
                             timeSlot.textContent = '?';
                             timeSlot.style.backgroundColor = '#FEF3C7';
                             timeSlot.style.color = '#D97706';
@@ -594,18 +594,18 @@
             const indicator = document.querySelector(`[data-vote-id="${date}"]`);
             if (!indicator) return;
             
-            const currentVote = votes[date] || 'maybe';
+            const currentVote = votes[date] || 'no response';
             let newVote;
             
             switch (currentVote) {
-                case 'maybe':
+                case 'no response':
                     newVote = 'yes';
                     break;
                 case 'yes':
                     newVote = 'no';
                     break;
                 default:
-                    newVote = 'maybe';
+                    newVote = 'no response';
             }
             
             votes[date] = newVote;
@@ -643,7 +643,7 @@
             switch (symbol) {
                 case '✓': return 'yes';
                 case '×': return 'no';
-                default: return 'maybe';
+                default: return 'no response';
             }
         }
 
