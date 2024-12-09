@@ -31,9 +31,11 @@ body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     margin-bottom: 1.5rem;
 }
-
+.logo-container {
+    text-align: center;
+}
 .logo-container img {
-    max-width: 150px;
+    max-width: 200px;
     height: auto;
     margin-bottom: 1rem;
 }
@@ -59,25 +61,29 @@ body {
     background: #EBF8FF;
     border-radius: 0.375rem;
     margin-top: 1rem;
+    width: 100%; /* Ensure it takes full width */
+    max-width: 300px; /* Set a maximum width */
+    min-width: 300px; /* Set a minimum width to prevent wrapping */
+    flex-wrap: nowrap; /* Prevent wrapping */
 }
 
-.timezone-icon {
-    width: 1.25rem;
-    height: 1.25rem;
-    stroke: #3182CE;
-    stroke-width: 2;
-    fill: none;
+.timezone-label {
+    font-size: 1rem;
+    color: var(--text-primary);
+    white-space: nowrap; /* Prevent the label from wrapping */
 }
 
 .timezone-select {
-    flex: 1;
+    flex: 1; /* Allow the select element to take up remaining space */
     padding: 0.5rem;
     border: 1px solid var(--border-color);
     border-radius: 0.375rem;
-    font-size: 1rem;
+    font-size: 12px; /* Set font size to 12px */
     color: var(--text-primary);
+    flex-shrink: 0; /* Prevent the select element from shrinking */
+    max-width: 150px; /* Set a maximum width */
+    width: auto; /* Ensure it adjusts to content */
 }
-
 /* Modern Select */
 .modern-select {
     width: 100%;
@@ -150,7 +156,7 @@ body {
     color: #057A55;
 }
 
-.indicator.maybe {
+.indicator.noresponse {
     background: #FEF3C7;
     color: #D97706;
 }
@@ -192,31 +198,43 @@ body {
 }
 
 .date-badge {
-    width: 3rem;
-    height: 3rem;
     background: #F3F4F6;
     border-radius: 0.5rem;
+    width: 4rem;
+    height: 4rem;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
+    padding: 0.5rem;
+    margin-right: 1rem;
 }
 
+.date-card.single-date:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
+}
 .date-badge .month {
     font-size: 0.875rem;
     color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 500;
+    line-height: 1;
+    margin-bottom: 0.25rem;
 }
 
 .date-badge .day {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-primary);
+    line-height: 1;
 }
 
 .date-details h3 {
-    font-weight: 600;
-    color: var(--text-primary);
+    font-size: 1rem;
+    color: var(--text-secondary);
     margin: 0;
+    font-weight: normal;
 }
 
 .date-details p {
@@ -278,9 +296,20 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: #F3F4F6;
-    color: #9CA3AF;
+    background: #FEF3C7; /* Default background for no response */
+    color: #D97706; /* Default color for no response */
     font-weight: 600;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.vote-indicator.yes {
+    background: #81D8D0; /* Tiffany blue for yes */
+    color: #ffffff;
+}
+
+.vote-indicator.no {
+    background: #FEE2E2; /* Light red for no */
+    color: #DC2626;
 }
 
 .time-slot.selected .vote-indicator {
@@ -419,6 +448,8 @@ body {
 
 /* Location Cards */
 .location-card {
+    cursor: pointer;
+    transition: background-color 0.3s;
     background: white;
     border-radius: 0.5rem;
     padding: 1rem;
@@ -433,7 +464,9 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
-
+.location-card:hover {
+    background-color: #f0f0f0;
+}
 .location-image {
     max-width: 250px;
     width: 100%;
@@ -471,7 +504,7 @@ body {
 
 .location-description {
     font-size: 1rem;
-    color: var(--text-secondary);
+    color: var (--text-secondary);
     margin-bottom: 1rem;
 }
 
@@ -492,7 +525,6 @@ body {
     }
 }
 
-/* ...existing code... */
 .no-dates,
 .no-locations {
     text-align: center;
@@ -501,7 +533,6 @@ body {
     margin: 1rem 0;
 }
 
-/* ...existing code... */
 
 .month-group {
     background: white;
@@ -530,37 +561,16 @@ body {
 
 .range-card {
     width: 100%;
-    padding: 0.75rem;  /* Reduced padding */
+    padding: 0.75rem;
     border: none;
     background: none;
     cursor: pointer;
     border-bottom: 1px solid var(--border-color);
 }
 
-.range-card .time-slot-content {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    min-height: 2.5rem;  /* Set consistent height */
+.range-card:hover {
+    background-color: #f0f0f0; /* Change background color on hover */
 }
-
-.range-card .time-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.range-card .time-info .time {
-    font-size: 0.875rem;  /* Slightly smaller text */
-    margin-bottom: 0.125rem;
-}
-
-.range-card .time-info .votes {
-    font-size: 0.75rem;  /* Smaller hint text */
-    margin-top: 0;
-}
-
 .range-card:last-child {
     border-bottom: none;
 }
@@ -571,26 +581,13 @@ body {
     color: #374151;
 }
 
-/* ...existing code... */
-
-.range-card .time-info {
-    flex: 1;
-    text-align: left;
+.timezone-select {
+    width: auto;
+    min-width: 100px;
+    max-width: 200px;
+    padding: 0.5rem;
 }
 
-.range-card .time-info .time {
-    font-weight: 500;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.range-card .time-info .votes {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin: 0;
-}
-
-/* ...existing code... */
 
 .month-header-content {
     flex: 1;
@@ -599,14 +596,9 @@ body {
 .expand-hint {
     font-size: 0.875rem;
     color: var(--text-secondary);
-    display: block;
-    margin-top: 0.25rem;
+    margin-top: 0.5rem;
     font-weight: normal;
-}
-
-.date-details .expand-hint {
-    font-size: 0.75rem;
-    color: var(--tiffany-blue);
+    text-align: center;
 }
 
 /* Date Vote Button */
@@ -618,30 +610,86 @@ body {
     border-radius: 0.375rem;
 }
 
-/* Location Vote Button */
 .location-vote-button {
-    background: #81D8D0;
-    color: gray;
-    padding: 0.5rem 1rem;
-    border-radius: 0.375rem;
-    font-weight: 500;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FEF3C7;  /* Yellow for no vote */
     border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    color: #D97706;  /* Question mark color */
 }
 
-.location-vote-button.selected {
-    background: #81D8D0;
-    color: gray;
+.location-vote-button[data-voted="true"] {
+    background: #81D8D0;  /* Tiffany blue for selected */
+    color: #ffffff;
+}
+
+.location-vote-button[data-voted="false"] {
+    background: #FEE2E2;  /* Light red for not selected */
+    color: #DC2626;
 }
 
 .location-vote-button:hover {
-    background: var(--tiffany-blue-hover);
+    transform: scale(1.1);
 }
 
-/* ...rest of existing code... */
+.location-vote-button.selected {
+    background: #81D8D0;  /* Tiffany blue for selected */
+    color: #ffffff;
+}
 
-/* ...existing code... */
+.location-vote-button.not-selected {
+    background: #FEE2E2;  /* Light red for not selected */
+    color: #DC2626;
+}
+
+.date-card {
+    margin-bottom: 0.5rem; /* Reduced from 1rem */
+}
+
+.date-header {
+    padding: 0.75rem; /* Reduced from 1rem */
+}
+
+.date-badge {
+    width: 3rem; /* Reduced from 4rem */
+    height: 3rem; /* Reduced from 4rem */
+}
+
+.date-badge .month {
+    font-size: 0.75rem; /* Reduced from 0.875rem */
+    margin-bottom: 0.15rem; /* Reduced from 0.25rem */
+}
+
+.date-badge .day {
+    font-size: 1.25rem; /* Reduced from 1.5rem */
+}
+
+.date-details h3 {
+    font-size: 0.875rem; /* Reduced from 1rem */
+    margin: 0;
+}
+
+.date-details p {
+    font-size: 0.75rem; /* Reduced from 0.875rem */
+    margin: 0;
+}
+
+.date-card.single-date .content-wrapper {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+ }
+ 
+ .date-card.single-date .vote-button {
+    margin-left: auto;
+ }
 
 .date-card.single-date {
     display: flex;
@@ -676,6 +724,136 @@ body {
     color: var(--tiffany-blue);
     padding: 0 0 0.5rem 4.5rem; /* Align with date text (date badge width + gap) */
     margin: 0;
+
+}.date-card.single-date .date-details h3 {
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin: 0;
+    font-weight: 500;
 }
 
-/* ...rest of existing code... */
+.date-card.single-date .content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    gap: 1rem;
+}
+
+.date-card.single-date .date-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+.availability-legend {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 0.75rem;
+    align-items: center;
+ }
+ 
+ .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+ }
+ 
+ .legend-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+ }
+ 
+ .legend-icon.yes {
+    background: #81D8D0;
+    color: white;
+ }
+ 
+ .legend-icon.no {
+    background: #FEE2E2;
+    color: #DC2626;
+ }
+ 
+ .legend-icon.no-response {
+    background: #FEF3C7; 
+    color: #D97706;
+ }
+
+.tip {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    background: #F3F4F6;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid var(--tiffany-blue);
+}
+
+.confirmation-content {
+    text-align: center;
+    margin-top: 0rem;
+}
+
+.confirmation-content h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: .5rem;
+}
+
+.confirmation-content a {
+    color: var(--text-primary);
+    text-decoration: none;
+    font-size: 1.125rem;
+}
+
+.confirmation-content a:hover {
+    text-decoration: underline;
+}
+
+.cta-card {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.cta-card h2 {
+    font-size: 1.75rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.cta-card p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.cta-button-container {
+    display: flex;
+    justify-content: center;
+   
+}
+
+.cta-button-container .submit-button {
+    font-size: 1.125rem;
+    padding: 1rem 2rem;
+    text-decoration: none;
+}
+
+.confirmation-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+}

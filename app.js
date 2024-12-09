@@ -186,9 +186,13 @@ async function updateProfileInfo(e) {
     try {
         const updates = [];
         
-        // Update display name if changed
-        if (newFirstName !== currentUser.displayName.split(' ')[0] || newLastName !== currentUser.displayName.split(' ')[1]) {
-            updates.push(updateProfile(currentUser, { displayName: `${newFirstName} ${newLastName}` }));
+        // Only compare with existing displayName if it exists
+        if (!currentUser.displayName || 
+            newFirstName !== (currentUser.displayName.split(' ')[0] || '') || 
+            newLastName !== (currentUser.displayName.split(' ')[1] || '')) {
+            updates.push(updateProfile(currentUser, { 
+                displayName: `${newFirstName} ${newLastName}` 
+            }));
         }
         
         // Update email if changed
@@ -200,14 +204,18 @@ async function updateProfileInfo(e) {
         
         // Update database profile
         const userRef = ref(database, `users/${currentUser.uid}/profile`);
-        const userProfile = (await get(userRef)).val();
+        const profileSnapshot = await get(userRef);
+        const existingProfile = profileSnapshot.val() || {};
+        
         await set(userRef, {
+            ...existingProfile,
             firstName: newFirstName,
             lastName: newLastName,
             email: newEmail,
-            timezone: newTimezone || userProfile.timezone || 'UTC', // Preserve existing timezone if not changed
-            subscription: 'free', // Assuming subscription is not changing here
-            updatedAt: new Date().toISOString()
+            timezone: newTimezone || existingProfile.timezone || 'UTC',
+            subscription: existingProfile.subscription || 'free',
+            updatedAt: new Date().toISOString(),
+            createdAt: existingProfile.createdAt || new Date().toISOString()
         });
         
         // Update UI
@@ -339,6 +347,7 @@ async function createEvent(e) {
         })),
         userId: currentUser.uid,
         created: new Date().toISOString(),
+        createdInTimezone: document.getElementById('profileTimezone').value, // sets timezone for event creation
         tribeId: tribeId
     };
 
@@ -696,10 +705,7 @@ function renderEventsList(events) {
                 <div class="event-info">
                     <div class="event-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                            <line x1="16" y1="2" x2="16" y2="6"/>
-                            <line x1="8" y1="2" x2="8" y2="6"/>
-                            <line x1="3" y1="10" x2="21" y2="10"/>
+                            <polyline points="7 10 12 15 17 10"></polyline>
                         </svg>
                     </div>
                     <div class="event-name">${event.title}</div>
@@ -829,53 +835,106 @@ eventData.tribeInfo.size = eventData.tribeInfo.members.length;
     }
 }
 
+function formatDateRange(startDate, endDate) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    
+    const startDay = days[start.getDay()];
+    const endDay = days[end.getDay()];
+    const startFormatted = start.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' });
+    const endFormatted = end.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' });
+    
+    if (startDate === endDate) {
+        return `${startDay}, ${startFormatted}`;
+    }
+    return `${startDay}, ${startFormatted} to ${endDay}, ${endFormatted}`;
+}
+
 function renderVotesSummary(eventData) {
     const votes = eventData.votes || {};
     const tribeMembers = eventData.tribeInfo.size || 0;
 
-    return eventData.dates.map(date => {
+    // Calculate votes for each date as before
+    const votesByDate = eventData.dates.map((date, index) => {
         const dateKey = date.time ? 
             `${date.start}T${date.time}` : 
             `${date.start}`;
         
-        const yesVotes = Object.values(votes).filter(vote => 
-            vote.datePreferences && vote.datePreferences[dateKey] === 'yes'
-        ).length;
-        
-        const noVotes = Object.values(votes).filter(vote => 
-            vote.datePreferences && vote.datePreferences[dateKey] === 'no'
-        ).length;
+        const votesForDate = Object.entries(votes).map(([voter, preferences]) => ({
+            voter,
+            vote: preferences.datePreferences?.[dateKey] || 'no-response'
+        }));
 
-        const maybeVotes = Object.values(votes).filter(vote => 
-            vote.datePreferences && vote.datePreferences[dateKey] === 'maybe'
-        ).length;
+        const yesVotes = votesForDate.filter(v => v.vote === 'yes').length;
+        const noVotes = votesForDate.filter(v => v.vote === 'no').length;
+        const maybeVotes = votesForDate.filter(v => v.vote === 'maybe').length;
 
-        const noResponseCount = tribeMembers - (yesVotes + noVotes + maybeVotes);
+        return {
+            date,
+            yesVotes,
+            noVotes,
+            maybeVotes,
+            noResponseCount: tribeMembers - (yesVotes + noVotes + maybeVotes),
+            voters: votesForDate
+        };
+    });
+
+    // Find the date with most yes votes
+    const maxYesVotes = Math.max(...votesByDate.map(v => v.yesVotes));
+
+    return votesByDate.map((vote, index) => {
+        const displayDate = vote.date.start === vote.date.end ?
+            (eventData.type === 'specific' && vote.date.time ? 
+                formatDateForDisplay(vote.date.start, vote.date.time, document.getElementById('profileTimezone').value) :
+                formatDateRange(vote.date.start, vote.date.end)) :
+            formatDateRange(vote.date.start, vote.date.end);
 
         return `
-            <div class="vote-card">
-                <div class="vote-date">${date.displayRange}</div>
-                <div class="vote-stats">
-                    <div class="stat-item yes-votes">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                            <polyline points="22 4 12 14.01 9 11.01"/>
-                        </svg>
-                        ${yesVotes}
-                    </div>
-                    <div class="stat-item no-votes">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="18" y1="6" x2="6" y2="18"/>
-                            <line x1="6" y1="6" x2="18" y2="18"/>
-                        </svg>
-                        ${noVotes}
-                    </div>
-                    <div class="stat-item no-response">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M8 12h8"/>
-                        </svg>
-                        ${noResponseCount}
+<div class="vote-card ${vote.yesVotes === maxYesVotes && vote.yesVotes > 0 ? 'most-voted' : ''}">
+    <div class="vote-card-header">
+        <div class="vote-date">${displayDate}</div>
+    </div>
+    <div class="vote-stats">
+        <div class="stat-item yes-votes">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+            </svg>
+            ${vote.yesVotes}
+        </div>
+        <div class="stat-item no-votes">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+               <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+            </svg>
+            ${vote.noVotes}
+        </div>
+        <div class="stat-item no-response">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.5 9a3 3 0 0 1 5 1c0 2-3 3-3 3"/>
+                <circle cx="12" cy="17" r="1"/> 
+            </svg>
+            ${vote.noResponseCount}
+        </div>
+    </div>
+    <div class="vote-details-button">
+        <button class="vote-details-toggle" onclick="toggleVoteDetails('date-${index}')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4"/>
+                <path d="M12 8h.01"/>
+            </svg>
+            Show Responses
+        </button>
+    </div>
+    <div id="date-${index}" class="vote-details-panel">
+        <div class="voter-list">
+            ${vote.voters.map(voter => `
+                <div class="voter-item">
+                    <span class="voter-name">${voter.voter}</span>
+                    <span class="vote-type ${voter.vote}">${voter.vote}</span>
+                </div>
+            `).join('')}
                     </div>
                 </div>
             </div>
@@ -883,6 +942,7 @@ function renderVotesSummary(eventData) {
     }).join('');
 }
 
+// Modify renderLocationVotesSummary to highlight the most voted location
 function renderLocationVotesSummary(eventData) {
     const votes = eventData.votes || {};
     const locationVotes = {};
@@ -895,13 +955,28 @@ function renderLocationVotesSummary(eventData) {
         }
     });
 
-    return eventData.locations.map(location => {
+    // Find the location with most votes
+    const maxVotes = Math.max(...Object.values(locationVotes), 0);
+
+    return eventData.locations.map((location, index) => {
         const voteCount = locationVotes[location.name] || 0;
+        const votesForLocation = Object.entries(votes).map(([voter, preferences]) => ({
+            voter,
+            vote: preferences.locationPreferences?.selectedLocation === location.name ? 'yes' : 'no'
+        }));
+
         return `
-            <div class="vote-card">
-                <div class="vote-location">
+            <div class="vote-card ${voteCount === maxVotes && voteCount > 0 ? 'most-voted' : ''}">
+                <div class="vote-card-header">
                     <div class="location-name">${location.name}</div>
-                    ${location.description ? `<div class="location-description">${location.description}</div>` : ''}
+                    <button class="vote-details-toggle" onclick="toggleVoteDetails('location-${index}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4"/>
+                            <path d="M12 8h.01"/>
+                        </svg>
+                        Show Details
+                    </button>
                 </div>
                 <div class="vote-stats">
                     <div class="stat-item total-votes">
@@ -912,9 +987,25 @@ function renderLocationVotesSummary(eventData) {
                         ${voteCount}
                     </div>
                 </div>
+                <div id="location-${index}" class="vote-details-panel">
+                    <div class="voter-list">
+                        ${votesForLocation.map(voter => `
+                            <div class="voter-item">
+                                <span class="voter-name">${voter.voter}</span>
+                                <span class="vote-type ${voter.vote}">${voter.vote}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
             </div>
         `;
     }).join('');
+}
+window.toggleVoteDetails = function(id) {
+    const panel = document.getElementById(id);
+    if (panel) {
+        panel.classList.toggle('active');
+    }
 }
 
 function renderEventDetail(eventId, eventData) {
@@ -1670,6 +1761,7 @@ window.resetLocationForm = resetLocationForm;
 window.updateLocation = updateLocation;
 window.editLocation = editLocation;
 
+
 function renderEventSettings() {
     const eventSettingsContainer = document.getElementById('eventSettingsContainer');
     const includeLocationPreferencesCheckbox = document.getElementById('includeLocationPreferences');
@@ -1681,7 +1773,8 @@ function renderEventSettings() {
     eventSettingsContainer.innerHTML = `
         <div class="section-card">
             <h3>Group Event Page Settings</h3>
-            <div class="form-group">
+             <p class="section-tip">Tip: Be sure to include the sections you need on your event page for users to see and respond to. Remove sections you are not using.</p>
+             <div class="form-group">
                 <label>Include on Group Event Page:</label>
                 <div class="checkbox-grid">
                     <label class="checkbox">
@@ -1706,3 +1799,35 @@ document.addEventListener('DOMContentLoaded', () => {
     renderEventSettings();
     // ...existing code...
 });
+
+async function renderDatesList(dates, userId, eventId) {
+    const datesList = document.getElementById('datesList');
+    datesList.innerHTML = '';
+
+    dates.forEach(date => {
+        const dateCard = document.createElement('div');
+        dateCard.className = 'date-card';
+        dateCard.dataset.date = date.date;
+        dateCard.innerHTML = `
+            <div class="date-header" onclick="toggleDate('${date.date}')">
+                <span>${formatDateForDisplay(date.date)}</span>
+                <svg class="expand-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </div>
+            <div class="date-ranges">
+                ${date.times.map(time => `
+                    <div class="time-slot" data-time-id="${date.date}T${time}">
+                        <div class="time-slot-content">
+                            <div class="vote-indicator maybe" onclick="toggleVote('${date.date}', '${time}')"></div>
+                            <div class="time-info">
+                                <p class="time">${formatTimeForDisplay(time, date.date)}</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        datesList.appendChild(dateCard);
+    });
+}

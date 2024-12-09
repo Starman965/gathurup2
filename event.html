@@ -3,11 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Event Response | gathurUP</title>
-    <link rel="stylesheet" href="styles_event.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js" type="module"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js" type="module"></script>
+    <title>Event Hub | gathurUP</title>
+    <!-- SEO Meta Tags -->
+     <meta name="description" content="gathurUP helps you get friends together easily by finding the best dates for everyone. No more endless text threads or confusing email chains.">
+     <meta name="keywords" content="gathurUP, event planning, group scheduling, find dates, get together, friends, social planning">
+     <meta name="author" content="Tiffanie and David Lewis">
+     <head>
+   <!-- Open Graph Title -->
+   <meta property="og:title" content="Hey There - When can we get together?" />
+ 
+   <!-- Open Graph Description -->
+   <meta property="og:description" content="gathurUP helps you get friends together easily by finding the best dates for everyone. No more endless text threads or confusing email chains." />
+ 
+   <!-- Open Graph URL -->
+   <meta property="og:url" content="https://www.gathurup.com" />
+ 
+   <!-- Open Graph Image -->
+   <meta property="og:image" content="https://www.gathurup.com/gathurUP_teal_1200.png" />
+   <meta property="og:image:width" content="1200" />
+   <meta property="og:image:height" content="1200" />
+   
+   <link rel="stylesheet" href="styles_event.css">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.3.0/luxon.min.js"></script>
+    <script src="events.js" type="module"></script>
 </head>
 <body>
     <div class="max-w-3xl mx-auto p-6">
@@ -24,38 +42,48 @@
                 
                 <!-- Timezone Selector -->
                 <div class="timezone-selector">
-                    <svg class="timezone-icon" viewBox="0 0 24 24">
-                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                    <span class="timezone-label">Time Zone:</span>
                     <select id="timezoneSelect" class="timezone-select">
                         <!-- Populated by JavaScript -->
                     </select>
                 </div>
             </div>
         </div>
-
-        <!-- Instructions Card -->
+    <!-- instuctions Section -->
         <div class="instructions-card">
-            <h2>Click on the icon to cycle through your preferences</h2>
-            <div class="instructions-content">
-                <p>Choose one of the following for each option presented</p>
-                <div class="availability-legend">
-                    <span class="legend-item">
-                        <span class="indicator available">✓</span>
-                        Available
-                    </span>
-                    <span class="legend-item">
-                        <span class="indicator unavailable">×</span>
-                        Unavailable
-                    </span>
-                    <span class="legend-item">
-                        <span class="indicator maybe">?</span>
-                        No Response
-                    </span>
+            <h2>Instructions</h2>
+            <p>Click where you see these icons to submit your preferences. Click again to change the response.</p>
+           
+            <div class="availability-legend">
+              <div class="legend-item">
+                <div class="legend-icon yes">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                  </svg>
                 </div>
-       
+                Yes
+              </div>
+              <div class="legend-item">
+                <div class="legend-icon no">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                  </svg>
+                </div>
+                No 
+              </div>
+              <div class="legend-item">
+                <div class="legend-icon no-response">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.5 9a3 3 0 0 1 5 1c0 2-3 3-3 3"/>
+                    <circle cx="12" cy="17" r="1"/> 
+                  </svg>
+                </div>
+                No Response
+              </div>
             </div>
-        </div>
+           </div>
+
         <!-- Date Preferences Section -->
         <div id="datePreferencesSection" style="display: none;">
                 <!-- Response Summary Card -->
@@ -69,24 +97,24 @@
             <!-- Populated by JavaScript -->
         </div>
     </div>
-    <!-- Location Preferences Section -->
+      <!-- Location Preferences Section -->
     <div id="locationPreferencesSection" class="instructions-card" style="display: none;">
-     
-                <div class="instructions-card">
-                    <h2>Location Preferences</h2>
-                    <div id="locationPreferencesContainer" class="location-options">
-                        <!-- This section will be dynamically populated with JavaScript -->
-                    </div>
-                </div>
-
-        <!-- Submit Button -->
-        <div class="submit-container">
-            <button id="submitButton" class="submit-button">
-                Submit Preferences
-            </button>
+        <div class="instructions-card">
+            <h2>Location Preferences</h2>
+            <p class="tip">Tip: Choose your single favorite location preference from the choices provided</p>
+            <div id="locationPreferencesContainer" class="location-options">
+                <!-- This section will be dynamically populated with JavaScript -->
+            </div>
         </div>
     </div>
-</div>
+    
+    <!-- Submit Button Container - Moved outside of locationPreferencesSection -->
+    <div class="submit-container">
+        <button id="submitButton" class="submit-button">
+            Submit Preferences
+        </button>
+    </div>
+
     <!-- Name Selection Modal -->
     <div id="nameCaptureModal" class="name-capture-modal">
         <div class="modal-content">
@@ -103,659 +131,6 @@
             </div>
         </div>
     </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-        import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyAiFcWBrqP02_g3Hp3ESbnICMIn3LZQf7Y",
-            authDomain: "gathurup2.firebaseapp.com",
-            projectId: "gathurup2",
-            storageBucket: "gathurup2.firebasestorage.app",
-            messagingSenderId: "662651678876",
-            appId: "1:662651678876:web:048d46d2df83369d983d59",
-            databaseURL: "https://gathurup2-default-rtdb.firebaseio.com"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        let selectedName = '';
-        let selectedFullName = '';
-        let votes = {};
-        let locationVotes = {};
-
-        async function loadEventData() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get('event');
-            const userId = urlParams.get('user');
-
-            if (!eventId || !userId) {
-                console.error('Invalid event link');
-                return;
-            }
-
-            try {
-                const eventRef = ref(database, `users/${userId}/events/${eventId}`);
-                const eventSnap = await get(eventRef);
-
-                if (!eventSnap.exists()) {
-                    console.error('Event not found');
-                    return;
-                }
-
-                const event = eventSnap.val();
-                document.getElementById('eventTitleDisplay').textContent = event.title;
-                document.getElementById('eventDescription').textContent = event.description;
-
-                const tribeRef = ref(database, `users/${userId}/tribes/${event.tribeId}`);
-                const tribeSnap = await get(tribeRef);
-
-                if (!tribeSnap.exists()) {
-                    console.error('Tribe not found');
-                    return;
-                }
-
-                const tribe = tribeSnap.val();
-                const peopleRef = ref(database, `users/${userId}/people`);
-                const peopleSnap = await get(peopleRef);
-                const people = peopleSnap.val() || {};
-
-                const membersList = tribe.members.map(memberId => people[memberId]).filter(Boolean);
-
-                const nameSelect = document.getElementById('nameSelect');
-                nameSelect.innerHTML = '<option value="">Choose your name...</option>';
-                membersList.forEach(person => {
-                    const option = document.createElement('option');
-                    option.value = person.firstName;
-                    option.textContent = `${person.firstName} ${person.lastName}`;
-                    nameSelect.appendChild(option);
-                });
-
-                document.getElementById('loadingText').style.display = 'none';
-                document.getElementById('nameSelectContainer').style.display = 'block';
-
-                // Show or hide date preferences section
-                if (event.includeDatePreferences) {
-                    document.getElementById('datePreferencesSection').style.display = 'block';
-                    document.getElementById('responseSummaryCard').style.display = 'block';
-                    if (event.dates.length === 0) {
-                        document.getElementById('datesList').innerHTML = '<p class="no-dates">No Dates Provided</p>';
-                    } else {
-                        const dates = consolidateAndSortDates(event.dates);
-                        await renderDatesList(dates, userId, eventId);
-                    }
-                } else {
-                    document.getElementById('datePreferencesSection').style.display = 'none';
-                    document.getElementById('responseSummaryCard').style.display = 'none';
-                }
-
-                // Show or hide location preferences section
-                if (event.includeLocationPreferences) {
-                    document.getElementById('locationPreferencesSection').style.display = 'block';
-                    if (event.locations.length === 0) {
-                        document.getElementById('locationPreferencesContainer').innerHTML = '<p class="no-locations">No Locations Provided</p>';
-                    } else {
-                        await renderLocationPreferences(event.locations, userId, eventId);
-                    }
-                } else {
-                    document.getElementById('locationPreferencesSection').style.display = 'none';
-                }
-
-                // Consolidate and sort dates and times
-                const datesMap = event.dates.reduce((acc, dateObj) => {
-                    const dateKey = dateObj.start;
-                    if (!acc[dateKey]) {
-                        acc[dateKey] = {
-                            date: dateObj.start,
-                            times: []
-                        };
-                    }
-                    acc[dateKey].times.push(dateObj.time);
-                    return acc;
-                }, {});
-
-                const dates = Object.values(datesMap).sort((a, b) => new Date(a.date) - new Date(b.date));
-
-                // Render dates and times
-                await renderDatesList(dates, userId, eventId);
-
-                // Render location preferences
-                await renderLocationPreferences(event.locations, userId, eventId);
-
-                // Render response summary
-                renderResponseSummary(membersList.length, userId, eventId);
-            } catch (error) {
-                console.error('Error loading event data:', error);
-            }
-        }
-
-        function consolidateAndSortDates(dates) {
-            const datesMap = dates.reduce((acc, dateObj) => {
-                const dateKey = dateObj.start;
-                if (!acc[dateKey]) {
-                    acc[dateKey] = {
-                        date: dateObj.start,
-                        times: []
-                    };
-                }
-                if (dateObj.time) {
-                    acc[dateKey].times.push(dateObj.time);
-                }
-                return acc;
-            }, {});
-
-            return Object.values(datesMap).sort((a, b) => new Date(a.date) - new Date(b.date));
-        }
-
-        async function renderResponseSummary(totalMembers, userId, eventId) {
-            try {
-                const votesRef = ref(database, `users/${userId}/events/${eventId}/votes`);
-                const votesSnap = await get(votesRef);
-                const votesData = votesSnap.val() || {};
-
-                const uniqueResponders = new Set(Object.keys(votesData));
-                const responseCount = uniqueResponders.size;
-
-                document.getElementById('responseSummaryText').textContent = `${responseCount} of ${totalMembers} people responded`;
-            } catch (error) {
-                console.error('Error loading response summary:', error);
-            }
-        }
-
-        async function renderLocationPreferences(locations, userId, eventId) {
-            const container = document.getElementById('locationPreferencesContainer');
-            container.innerHTML = '';
-
-            const votesRef = ref(database, `users/${userId}/events/${eventId}/votes/${selectedFullName}/locationPreferences`);
-            const votesSnap = await get(votesRef);
-            const userLocationVote = votesSnap.val() || {};
-
-            locations.forEach((location, index) => {
-                const isSelected = userLocationVote.selectedLocation === location.name;
-                const buttonText = isSelected ? "My Preference" : "Select Your Preference";
-                const buttonClass = isSelected ? "vote-button selected" : "vote-button";
-
-                const locationCard = document.createElement('div');
-                locationCard.className = 'location-card';
-                locationCard.innerHTML = `
-                    ${location.imageUrl ? `<img src="${location.imageUrl}" alt="${location.name}" class="location-image">` : `<div class="no-image">NO IMAGE PROVIDED</div>`}
-                    <div class="location-details">
-                        <h3 class="location-title">${location.name}</h3>
-                        <p class="location-description">${location.description}</p>
-                        <div class="vote-buttons">
-                            <button class="${buttonClass} location-vote-button" id="vote-button-${index}" onclick="voteLocation('${location.name}')">
-                                ${buttonText}
-                            </button>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(locationCard);
-            });
-        }
-
-        window.voteLocation = function(locationName) {
-            document.querySelectorAll('.location-vote-button').forEach(button => {
-                button.classList.remove('selected');
-                button.textContent = "Select Your Preference"; // Update text for non-selected buttons
-            });
-
-            const selectedButton = document.querySelector(`.location-vote-button[onclick="voteLocation('${locationName}')"]`);
-            selectedButton.classList.add('selected');
-            selectedButton.textContent = "My Preference"; // Update text for selected button
-
-            locationVotes = { selectedLocation: locationName };
-        };
-
-        window.confirmName = async function() {
-            const nameSelect = document.getElementById('nameSelect');
-            selectedFullName = nameSelect.options[nameSelect.selectedIndex].text;
-            if (selectedFullName) {
-                document.getElementById('nameCaptureModal').style.display = 'none';
-                await loadUserVotes();
-                await loadEventData(); // Ensure location preferences are rendered after selecting the user
-            }
-        };
-
-        async function loadUserVotes() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get('event');
-            const userId = urlParams.get('user');
-
-            try {
-                const votesRef = ref(database, `users/${userId}/events/${eventId}/votes/${selectedFullName}`);
-                const votesSnap = await get(votesRef);
-                const userVotes = votesSnap.val() || {};
-
-                votes = userVotes.datePreferences || {};
-                locationVotes = userVotes.locationPreferences || {};
-
-                for (const [timeSlotId, vote] of Object.entries(votes)) {
-                    const timeSlot = document.querySelector(`.time-slot[data-time-id="${timeSlotId}"] .vote-indicator`);
-                    if (timeSlot) {
-                        if (vote === 'yes') {
-                            timeSlot.textContent = '✓';
-                            timeSlot.style.backgroundColor = '#DEF7EC';
-                            timeSlot.style.color = '#057A55';
-                        } else if (vote === 'no response') {
-                            timeSlot.textContent = '?';
-                            timeSlot.style.backgroundColor = '#FEF3C7';
-                            timeSlot.style.color = '#D97706';
-                        } else {
-                            timeSlot.textContent = '×';
-                            timeSlot.style.backgroundColor = '#FEE2E2';
-                            timeSlot.style.color = '#DC2626';
-                        }
-                    }
-                }
-
-                // Ensure the event object is available
-                const eventRef = ref(database, `users/${userId}/events/${eventId}`);
-                const eventSnap = await get(eventRef);
-                const event = eventSnap.val();
-
-                // Render location preferences with the user's current selection
-                await renderLocationPreferences(event.locations, userId, eventId);
-            } catch (error) {
-                console.error('Error loading user votes:', error);
-            }
-        }
-
-        window.toggleDate = function(date) {
-            const dateCard = document.querySelector(`.date-card[data-date="${date}"]`);
-            const dateRanges = dateCard.querySelector('.date-ranges');
-            const expandIcon = dateCard.querySelector('.expand-icon');
-            
-            if (dateRanges) {
-                const isExpanded = dateRanges.style.display === 'block';
-                dateRanges.style.display = isExpanded ? 'none' : 'block';
-                if (expandIcon) {
-                    expandIcon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
-                }
-            }
-        };
-
-        window.toggleVote = function(date, time) {
-            const timeSlotId = time ? `${date}T${time}` : date;
-            const indicator = document.querySelector(`[data-time-id="${timeSlotId}"] .vote-indicator`) || 
-                             document.querySelector(`[data-date="${date}"] .vote-indicator`);
-            
-            if (indicator) {
-                const currentVote = votes[timeSlotId] || 'maybe';
-                let newVote;
-                
-                switch (currentVote) {
-                    case 'maybe':
-                        newVote = 'yes';
-                        break;
-                    case 'yes':
-                        newVote = 'no';
-                        break;
-                    default:
-                        newVote = 'maybe';
-                }
-                
-                votes[timeSlotId] = newVote;
-                updateVoteIndicatorDisplay(indicator, newVote);
-            }
-        };
-
-        async function submitPreferences() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const eventId = urlParams.get('event');
-            const userId = urlParams.get('user');
-
-            if (!selectedFullName) {
-                alert('Please select your name.');
-                return;
-            }
-
-            try {
-                const votesRef = ref(database, `users/${userId}/events/${eventId}/votes/${selectedFullName}`);
-                await set(votesRef, {
-                    datePreferences: votes,
-                    locationPreferences: locationVotes
-                });
-                alert('Preferences submitted successfully.');
-            } catch (error) {
-                console.error('Error submitting preferences:', error);
-                alert('Error submitting preferences.');
-            }
-        }
-
-        document.getElementById('submitButton').addEventListener('click', submitPreferences);
-
-        document.addEventListener('DOMContentLoaded', () => {
-            loadEventData();
-            populateTimezoneSelect();
-        });
-
-    
-        // Add this new helper function
-        function updateVoteIndicatorDisplay(indicator, vote) {
-            switch (vote) {
-                case 'yes':
-                    indicator.textContent = '✓';
-                    indicator.style.backgroundColor = '#DEF7EC';
-                    indicator.style.color = '#057A55';
-                    break;
-                case 'no':
-                    indicator.textContent = '×';
-                    indicator.style.backgroundColor = '#FEE2E2';
-                    indicator.style.color = '#DC2626';
-                    break;
-                default:
-                    indicator.textContent = '?';
-                    indicator.style.backgroundColor = '#FEF3C7';
-                    indicator.style.color = '#D97706';
-            }
-        }
-
-        async function renderDatesList(dates, userId, eventId) {
-            const container = document.getElementById('datesList');
-            const eventRef = ref(database, `users/${userId}/events/${eventId}`);
-            const eventSnap = await get(eventRef);
-            const event = eventSnap.val();
-
-            // Load existing votes for current user
-            const userVotesRef = ref(database, `users/${userId}/events/${eventId}/votes/${selectedFullName}/datePreferences`);
-            const userVotesSnap = await get(userVotesRef);
-            const userVotes = userVotesSnap.val() || {};
-
-            const getVoteIndicator = (dateId) => {
-                const vote = userVotes[dateId];
-                let symbol = '?', bgColor = '#FEF3C7', textColor = '#D97706';
-                
-                if (vote === 'yes') {
-                    symbol = '✓';
-                    bgColor = '#DEF7EC';
-                    textColor = '#057A55';
-                } else if (vote === 'no') {
-                    symbol = '×';
-                    bgColor = '#FEE2E2';
-                    textColor = '#DC2626';
-                }
-                
-                return `<div class="vote-indicator" style="background-color: ${bgColor}; color: ${textColor};">${symbol}</div>`;
-            };
-
-            let html = '';
-
-            if (event.type === 'range') {
-                // Group dates by month/year for range events
-                const monthGroups = {};
-                event.dates.forEach(dateObj => {
-                    const startDate = new Date(dateObj.start);
-                    const monthKey = startDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                    if (!monthGroups[monthKey]) monthGroups[monthKey] = [];
-                    monthGroups[monthKey].push(dateObj);
-                });
-
-                html = Object.entries(monthGroups).map(([month, ranges]) => `
-                    <div class="month-group">
-                        <div class="month-header" onclick="toggleMonth('${month}')">
-                            <div class="month-header-content">
-                                <h3>${month}</h3>
-                                <span class="expand-hint">Click to see ${ranges.length} date range${ranges.length > 1 ? 's' : ''}</span>
-                            </div>
-                            <svg class="expand-icon" viewBox="0 0 24 24">
-                                <path d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                        <div class="date-ranges" id="month-${month.replace(/\s+/g, '-')}" style="display: none;">
-                            ${ranges.map(dateObj => `
-                                <div class="range-card" data-date="${dateObj.start}">
-                                    <div class="time-slot-content">
-                                        <button class="date-vote-button" onclick="toggleSingleDateVote('${dateObj.start}')">
-                                            <div class="vote-indicator" data-vote-id="${dateObj.start}">?</div>
-                                        </button>
-                                        <div class="time-info">
-                                            <p class="time">${new Date(dateObj.start).toLocaleDateString('en-US', { 
-                                                weekday: 'short',
-                                                month: 'short', 
-                                                day: 'numeric'
-                                            })} - ${new Date(dateObj.end).toLocaleDateString('en-US', { 
-                                                weekday: 'short',
-                                                month: 'short', 
-                                                day: 'numeric'
-                                            })}</p>
-                                            <p class="votes">Click the icon to set your perference</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `).join('');
-            } else if (!event.dates.some(d => d.time)) {
-                // Single dates without time slots
-                html = event.dates.map(dateObj => `
-                    <div class="date-card single-date" data-date="${dateObj.start}">
-                        <div class="content-wrapper">
-                            <div class="date-info">
-                                <div class="date-badge">
-                                    <span class="month">${new Date(dateObj.start).toLocaleDateString('en-US', { month: 'short' })}</span>
-                                    <span class="day">${new Date(dateObj.start).getDate()}</span>
-                                </div>
-                                <div class="date-details">
-                                    <h3>${new Date(dateObj.start).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h3>
-                                    
-                                </div>
-                            </div>
-                            <button class="date-vote-button" onclick="toggleSingleDateVote('${dateObj.start}')">
-                                <div class="vote-indicator" data-vote-id="${dateObj.start}">${getVoteIndicator(dateObj.start)}</div>
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            } else {
-                // Dates with time slots
-                html = event.dates.map(dateObj => `
-                    <div class="date-card" data-date="${dateObj.start}">
-                        <div class="month-header" onclick="toggleDate('${dateObj.start}')">
-                            <div class="month-header-content">
-                                <div class="date-info">
-                                    <div class="date-badge">
-                                        <span class="month">${new Date(dateObj.start).toLocaleDateString('en-US', { month: 'short' })}</span>
-                                        <span class="day">${new Date(dateObj.start).getDate()}</span>
-                                    </div>
-                                    <div class="date-details">
-                                        <h3>${new Date(dateObj.start).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}</h3>
-                                        <span class="expand-hint">Click to see time slot(s)</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <svg class="expand-icon" viewBox="0 0 24 24">
-                                <path d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </div>
-                        <div class="date-ranges" style="display: none;">
-                            <div class="time-slot" data-time-id="${dateObj.start}T${dateObj.time}">
-                                <div class="time-slot-content">
-                                    <button class="date-vote-button" onclick="toggleTimeSlotVote('${dateObj.start}', '${dateObj.time}')">
-                                        ${getVoteIndicator(`${dateObj.start}T${dateObj.time}`)}
-                                    </button>
-                                    <div class="time-info">
-                                        <p class="time">${formatTime(dateObj.time)}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-            }
-
-            container.innerHTML = html;
-        }
-
-        // Add these new vote handling functions
-        window.toggleSingleDateVote = function(date) {
-            const indicator = document.querySelector(`[data-vote-id="${date}"]`);
-            if (!indicator) return;
-            
-            const currentVote = votes[date] || 'no response';
-            let newVote;
-            
-            switch (currentVote) {
-                case 'no response':
-                    newVote = 'yes';
-                    break;
-                case 'yes':
-                    newVote = 'no';
-                    break;
-                default:
-                    newVote = 'no response';
-            }
-            
-            votes[date] = newVote;
-            updateVoteIndicatorDisplay(indicator, newVote);
-            
-            // Prevent event from bubbling up to parent elements
-            event.stopPropagation();
-        };
-
-        window.toggleTimeSlotVote = function(date, time) {
-            const timeSlotId = `${date}T${time}`;
-            const indicator = document.querySelector(`.time-slot[data-time-id="${timeSlotId}"] .vote-indicator`);
-            updateVoteIndicator(indicator);
-            votes[timeSlotId] = getVoteValue(indicator.textContent);
-        };
-
-        function updateVoteIndicator(indicator) {
-            const currentSymbol = indicator.textContent;
-            if (currentSymbol === '?') {
-                indicator.textContent = '✓';
-                indicator.style.backgroundColor = '#DEF7EC';
-                indicator.style.color = '#057A55';
-            } else if (currentSymbol === '✓') {
-                indicator.textContent = '×';
-                indicator.style.backgroundColor = '#FEE2E2';
-                indicator.style.color = '#DC2626';
-            } else {
-                indicator.textContent = '?';
-                indicator.style.backgroundColor = '#FEF3C7';
-                indicator.style.color = '#D97706';
-            }
-        }
-
-        function getVoteValue(symbol) {
-            switch (symbol) {
-                case '✓': return 'yes';
-                case '×': return 'no';
-                default: return 'no response';
-            }
-        }
-
-        async function getTotalAvailableCount(times, date, userId, eventId) {
-            const votesRef = ref(database, `users/${userId}/events/${eventId}/votes`);
-            const votesSnap = await get(votesRef);
-            const votesData = votesSnap.val() || {};
-
-            let availableCount = 0;
-            for (const time of times) {
-                const timeSlotId = `${date}T${time}`;
-                for (const voter in votesData) {
-                    if (votesData[voter].datePreferences && votesData[voter].datePreferences[timeSlotId] === 'yes') {
-                        availableCount++;
-                    }
-                }
-            }
-            return availableCount;
-        }
-
-        async function renderTimeSlots(times, date, userId, eventId) {
-            if (times.length === 0) {
-                return `
-                    <button class="time-slot" 
-                            onclick="toggleVote('${date}', '')"
-                            data-time-id="${date}">
-                        <div class="time-slot-content">
-                            <div class="vote-indicator" style="background-color: #FEF3C7; color: #D97706;">?</div>
-                            <div class="time-info">
-                                <p class="time">All Day</p>
-                                <p class="votes">0 person(s) selected this time</p>
-                            </div>
-                        </div>
-                    </button>
-                `;
-            }
-
-            const timesHtml = await Promise.all(times.map(async time => {
-                const timeSlotId = `${date}T${time}`;
-                const votesRef = ref(database, `users/${userId}/events/${eventId}/votes`);
-                const votesSnap = await get(votesRef);
-                const votesData = votesSnap.val() || {};
-
-                let availableCount = 0;
-                for (const voter in votesData) {
-                    if (votesData[voter].datePreferences && votesData[voter].datePreferences[timeSlotId] === 'yes') {
-                        availableCount++;
-                    }
-                }
-
-                return `
-                    <button class="time-slot" 
-                            onclick="toggleVote('${date}', '${time}')"
-                            data-time-id="${timeSlotId}">
-                        <div class="time-slot-content">
-                            <div class="vote-indicator" style="background-color: #FEF3C7; color: #D97706;">?</div>
-                            <div class="time-info">
-                                <p class="time">${formatTime(time)}</p>
-                                <p class="votes">${availableCount} person(s) selected this time</p>
-                            </div>
-                        </div>
-                    </button>
-                `;
-            }));
-            return timesHtml.join('');
-        }
-
-        function formatTime(time) {
-            try {
-                const [hours, minutes] = time.split(':');
-                const date = new Date();
-                date.setHours(parseInt(hours), parseInt(minutes));
-                return date.toLocaleTimeString('en-US', { 
-                    hour: 'numeric', 
-                    minute: '2-digit',
-                    hour12: true 
-                });
-            } catch (e) {
-                return time; // Fallback to original format if parsing fails
-            }
-        }
-
-        function populateTimezoneSelect() {
-            const timezoneSelect = document.getElementById('timezoneSelect');
-            const timezones = [
-                "America/Los_Angeles", "America/New_York", "America/Chicago", "America/Denver",
-                "America/Phoenix", "America/Anchorage", "Pacific/Honolulu"
-            ];
-            const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-            timezoneSelect.innerHTML = '<option value="">Select Time Zone</option>';
-            timezones.forEach(tz => {
-                const option = document.createElement('option');
-                option.value = tz;
-                option.textContent = tz.replace('_', ' ');
-                if (tz === userTimezone) {
-                    option.selected = true;
-                }
-                timezoneSelect.appendChild(option);
-            });
-        }
-
-        // Add/update the toggle month function
-        window.toggleMonth = function(month) {
-            const monthContent = document.getElementById(`month-${month.replace(/\s+/g, '-')}`);
-            const isExpanded = monthContent.style.display === 'block';
-            monthContent.style.display = isExpanded ? 'none' : 'block';
-            const icon = monthContent.parentElement.querySelector('.expand-icon');
-            icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
-        };
-
-    </script>
 
 </body>
 </html>
