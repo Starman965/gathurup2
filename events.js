@@ -269,6 +269,9 @@ async function loadEventData() {
         document.getElementById('eventTitleDisplay').textContent = eventData.title;
         document.getElementById('eventDescription').textContent = eventData.description;
 
+        // Populate event details if they exist
+        populateEventDetails(eventData);
+
         // Load tribe data
         const tribeRef = ref(database, `users/${userId}/tribes/${eventData.tribeId}`);
         const tribeSnap = await get(tribeRef);
@@ -322,7 +325,11 @@ async function loadEventData() {
             document.getElementById('locationPreferencesSection').style.display = 'block';
             await renderLocationPreferences(eventData.locations, userId, eventId);
         }
-
+// Hide poll instructions and poll responses if both preferences are false
+if (!eventData.includeDatePreferences && !eventData.includeLocationPreferences) {
+    document.querySelector('.instructions-card').style.display = 'none';
+    document.getElementById('responseSummaryCard').style.display = 'none';
+}
         // Load existing votes if any
         if (selectedFullName) {
             await loadUserVotes();
@@ -371,7 +378,7 @@ async function renderResponseSummary(totalMembers, userId, eventId) {
         const uniqueResponders = new Set(Object.keys(votesData));
         const responseCount = uniqueResponders.size;
 
-        document.getElementById('responseSummaryText').textContent = `${responseCount} of ${totalMembers} people responded`;
+        document.getElementById('responseSummaryText').textContent = `${responseCount} of ${totalMembers} people responded to the poll so far`;
     } catch (error) {
         console.error('Error loading response summary:', error);
     }
@@ -870,3 +877,182 @@ window.toggleSingleDateVote = function(date) {
     
     event.stopPropagation();
 };
+
+function formatTimeString(timeStr) {
+    if (!timeStr) return '';
+    const [hours, minutes] = timeStr.split(':');
+    const hour = parseInt(hours);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${period}`;
+}
+
+function populateEventDetails(eventData) {
+    const eventDetailsCard = document.getElementById('eventDetailsCard');
+    if (!eventData.includeEventDetails || !eventData.eventDetails) {
+        eventDetailsCard.style.display = 'none';
+        return;
+    }
+
+    // Show the card
+    eventDetailsCard.style.display = 'block';
+
+    // Location Details
+    const locationDetails = document.getElementById('locationDetails');
+    if (eventData.eventDetails.location) {
+        locationDetails.style.display = 'flex';
+        document.getElementById('eventLocationName').textContent = eventData.eventDetails.location;
+        document.getElementById('eventLocationAddress').textContent = eventData.eventDetails.locationAddress || '';
+        
+        const locationUrl = document.getElementById('eventLocationUrl');
+        if (eventData.eventDetails.locationUrl) {
+            locationUrl.href = eventData.eventDetails.locationUrl;
+            locationUrl.textContent = 'View Location';
+            locationUrl.style.display = 'inline';
+        } else {
+            locationUrl.style.display = 'none';
+        }
+
+        const showOnMapUrl = document.getElementById('showOnMapUrl');
+        if (eventData.eventDetails.locationAddress) {
+            const encodedAddress = encodeURIComponent(eventData.eventDetails.locationAddress);
+            showOnMapUrl.href = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+            showOnMapUrl.style.display = 'inline';
+        } else {
+            showOnMapUrl.style.display = 'none';
+        }
+    } else {
+        locationDetails.style.display = 'none';
+    }
+
+    // Date Details
+    const dateDetails = document.getElementById('dateDetails');
+    if (eventData.eventDetails.startDate) {
+        dateDetails.style.display = 'flex';
+        const startDate = formatDateForDisplay(eventData.eventDetails.startDate, '', { 
+            weekday: 'long', 
+            month: 'long', 
+            day: 'numeric', 
+            year: 'numeric' 
+        });
+        const endDate = eventData.eventDetails.endDate ? 
+            formatDateForDisplay(eventData.eventDetails.endDate, '', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric'
+            }) : '';
+        document.getElementById('eventDateRange').textContent = endDate ? 
+            `${startDate} to ${endDate}` : startDate;
+
+        // Populate hidden date inputs
+        document.getElementById('eventStartDate').value = eventData.eventDetails.startDate;
+        document.getElementById('eventEndDate').value = eventData.eventDetails.endDate || '';
+    } else {
+        dateDetails.style.display = 'none';
+    }
+
+    // Time Details
+    const timeDetails = document.getElementById('timeDetails');
+    if (eventData.eventDetails.startTime) {
+        timeDetails.style.display = 'flex';
+        const startTime = formatTimeString(eventData.eventDetails.startTime);
+        const endTime = eventData.eventDetails.endTime ? 
+            formatTimeString(eventData.eventDetails.endTime) : '';
+        document.getElementById('eventTimeRange').textContent = endTime ? 
+            `${startTime} to ${endTime}` : startTime;
+
+        // Populate hidden time inputs
+        document.getElementById('eventStartTime').value = eventData.eventDetails.startTime;
+        document.getElementById('eventEndTime').value = eventData.eventDetails.endTime || '';
+    } else {
+        timeDetails.style.display = 'none';
+    }
+
+    // Attire Details
+    const attireDetails = document.getElementById('attireDetails');
+    if (eventData.eventDetails.attire) {
+        attireDetails.style.display = 'flex';
+        document.getElementById('eventAttire').textContent = 
+            eventData.eventDetails.attire.charAt(0).toUpperCase() + 
+            eventData.eventDetails.attire.slice(1);
+        const attireComments = document.getElementById('eventAttireComments');
+        if (eventData.eventDetails.attireComments) {
+            attireComments.textContent = eventData.eventDetails.attireComments;
+            attireComments.style.display = 'block';
+        } else {
+            attireComments.style.display = 'none';
+        }
+    } else {
+        attireDetails.style.display = 'none';
+    }
+
+    // Food Details
+    const foodDetails = document.getElementById('foodDetails');
+    if (eventData.eventDetails.food) {
+        foodDetails.style.display = 'flex';
+        document.getElementById('eventFood').textContent = eventData.eventDetails.food;
+    } else {
+        foodDetails.style.display = 'none';
+    }
+
+    // Additional Comments
+    const additionalDetails = document.getElementById('additionalDetails');
+    if (eventData.eventDetails.additionalComments) {
+        additionalDetails.style.display = 'flex';
+        document.getElementById('eventAdditionalComments').textContent = 
+            eventData.eventDetails.additionalComments;
+    } else {
+        additionalDetails.style.display = 'none';
+    }
+}
+function generateCalendarLink(eventData) {
+    const { title, description, startDate, endDate, startTime, endTime, location, createdInTimezone } = eventData;
+
+    // Use Luxon to handle time zone conversion
+    const startDateTime = luxon.DateTime.fromISO(`${startDate}T${startTime}`, { zone: createdInTimezone }).toUTC().toFormat("yyyyMMdd'T'HHmmss'Z'");
+    const endDateTime = luxon.DateTime.fromISO(`${endDate}T${endTime}`, { zone: createdInTimezone }).toUTC().toFormat("yyyyMMdd'T'HHmmss'Z'");
+
+    const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDateTime}/${endDateTime}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}&sf=true&output=xml`;
+
+    return googleCalendarUrl;
+}
+
+document.getElementById('addToCalendarButton').addEventListener('click', function() {
+    const eventTitleElement = document.getElementById('eventTitleDisplay');
+    const eventDescriptionElement = document.getElementById('eventDescription');
+    const eventStartDateElement = document.getElementById('eventStartDate');
+    const eventEndDateElement = document.getElementById('eventEndDate');
+    const eventStartTimeElement = document.getElementById('eventStartTime');
+    const eventEndTimeElement = document.getElementById('eventEndTime');
+    const eventLocationElement = document.getElementById('eventLocationName');
+
+    console.log('eventTitleElement:', eventTitleElement);
+    console.log('eventDescriptionElement:', eventDescriptionElement);
+    console.log('eventStartDateElement:', eventStartDateElement);
+    console.log('eventEndDateElement:', eventEndDateElement);
+    console.log('eventStartTimeElement:', eventStartTimeElement);
+    console.log('eventEndTimeElement:', eventEndTimeElement);
+    console.log('eventLocationElement:', eventLocationElement);
+
+    if (!eventTitleElement || !eventDescriptionElement || !eventStartDateElement || !eventEndDateElement || !eventStartTimeElement || !eventEndTimeElement || !eventLocationElement) {
+        console.error('One or more event detail elements are missing');
+        return;
+    }
+
+    const eventData = {
+        title: eventTitleElement.textContent,
+        description: eventDescriptionElement.textContent,
+        startDate: eventStartDateElement.value,
+        endDate: eventEndDateElement.value,
+        startTime: eventStartTimeElement.value,
+        endTime: eventEndTimeElement.value,
+        location: eventLocationElement.textContent,
+        createdInTimezone: 'America/Los_Angeles' // Replace with the actual time zone from your data
+    };
+
+    console.log('eventData:', eventData);
+
+    const calendarLink = generateCalendarLink(eventData);
+    window.open(calendarLink, '_blank');
+});

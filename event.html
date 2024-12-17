@@ -49,10 +49,131 @@
                 </div>
             </div>
         </div>
-    <!-- instuctions Section -->
+
+                <!-- Event Details Card -->
+        <div id="eventDetailsCard" class="event-details-card" style="display: none;">
+            <h2>Event Details</h2>
+            <div class="event-details-content">
+                <!-- Location Details -->
+                <div id="locationDetails" class="detail-item" style="display: none;">
+                    <div class="detail-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Location</h3>
+                        <p id="eventLocationName"></p>
+                        <p id="eventLocationAddress" class="secondary-text"></p>
+                        <a id="eventLocationUrl" class="location-link" target="_blank">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"></path>
+                                <circle cx="12" cy="9" r="2.5"></circle>
+                            </svg>
+                            View Location
+                        </a>
+                        <a id="showOnMapUrl" class="location-link" target="_blank" style="margin-left: 10px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>
+                            Show on Map
+                        </a>
+                    </div>
+                </div>
+        
+                <!-- Date Details -->
+                <div id="dateDetails" class="detail-item" style="display: none;">
+                    <div class="detail-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Date</h3>
+                        <p id="eventDateRange"></p>
+                        <input type="date" id="eventStartDate" style="display: none;">
+                        <input type="date" id="eventEndDate" style="display: none;">
+                    </div>
+                </div>
+        
+                <!-- Time Details -->
+                <div id="timeDetails" class="detail-item" style="display: none;">
+                    <div class="detail-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Time</h3>
+                        <p id="eventTimeRange"></p>
+                        <input type="time" id="eventStartTime" style="display: none;">
+                        <input type="time" id="eventEndTime" style="display: none;">
+                    </div>
+                </div>
+        
+                <!-- Attire Details -->
+                <div id="attireDetails" class="detail-item" style="display: none;">
+                    <div class="detail-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"></path>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Attire</h3>
+                        <p id="eventAttire"></p>
+                        <p id="eventAttireComments" class="secondary-text"></p>
+                    </div>
+                </div>
+        
+                <!-- Food Details -->
+                <div id="foodDetails" class="detail-item" style="display: none;">
+                    <div class="detail-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M18 8h1a4 4 0 010 8h-1"></path>
+                            <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"></path>
+                            <line x1="6" y1="1" x2="6" y2="4"></line>
+                            <line x1="10" y1="1" x2="10" y2="4"></line>
+                            <line x1="14" y1="1" x2="14" y2="4"></line>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Food & Beverages</h3>
+                        <p id="eventFood"></p>
+                    </div>
+                </div>
+        
+                <!-- Additional Details -->
+                <div id="additionalDetails" class="detail-item" style="display: none;">
+                    <div class="detail-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                        </svg>
+                    </div>
+                    <div class="detail-content">
+                        <h3>Additional Information</h3>
+                        <p id="eventAdditionalComments"></p>
+                    </div>
+                </div>
+        
+                <!-- Add to Calendar Button -->
+                <div class="detail-item">
+                    <button id="addToCalendarButton" class="submit-button">Add to Calendar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions Card -->
         <div class="instructions-card">
-            <h2>Instructions</h2>
-            <p>Click where you see these icons to submit your preferences. Click again to change the response.</p>
+            <h2>Poll Instructions</h2>
+            <p>Expand the menus and click these icons to share your preferences. Clicking again cycles responses. When all done, click "Continue to Submit" at the bottom of the page</p>
            
             <div class="availability-legend">
               <div class="legend-item">
@@ -88,7 +209,7 @@
         <div id="datePreferencesSection" style="display: none;">
                 <!-- Response Summary Card -->
             <div id="responseSummaryCard" class="response-summary-card">
-            <h2>Date Response Summary</h2>
+            <h2>Poll Responses</h2>
             <p id="responseSummaryText">Loading...</p>
         </div>
 
@@ -111,12 +232,12 @@
     <!-- Submit Button Container - Moved outside of locationPreferencesSection -->
     <div class="submit-container">
         <button id="submitButton" class="submit-button">
-            Submit Preferences
+            Continue
         </button>
     </div>
 
     <!-- Name Selection Modal -->
-    <div id="nameCaptureModal" class="name-capture-modal">
+        <div id="nameCaptureModal" class="name-capture-modal">
         <div class="modal-content">
             <h2>Welcome!</h2>
             <p id="loadingText">Loading...</p>

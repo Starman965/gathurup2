@@ -183,11 +183,23 @@ body {
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     border: 1px solid var(--border-color);
 }
-
+/* Define a class for setting a maximum width */
+.max-width-200 {
+    max-width: 200px; /* Set a maximum width */
+    width: 100%; /* Ensure it takes full width up to the max-width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
 /* Form Elements */
 .form-group {
-    margin-bottom: 20px;
+    display: block;
+    margin-bottom: 1rem;
 }
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
 .form-group input[type="text"],
 .form-group textarea {
     padding-right: 15px; /* Adjust the value as needed */
@@ -240,6 +252,7 @@ textarea {
 
 /* Buttons */
 .primary-button {
+    font-size: 16px;
     height: 40px;
     padding: 8px 24px;
     background: var(--tiffany-blue);
@@ -258,15 +271,22 @@ textarea {
 }
 
 /* Handles "Add Option" button */
-.primary-button.add-date-button {
+.add-date-button {
     font-size: 16px; /* Adjust the font size as needed */
+    max-width: 200px; /* Set a maximum width */
+    width: 100%; /* Ensure it takes full width up to the max-width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 /* Handles "Add Location" button */
 .primary-button.add-location-button {
     font-size: 16px; /* Adjust the font size as needed */
+    max-width: 200px; /* Set a maximum width */
+    width: 100%; /* Ensure it takes full width up to the max-width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 .secondary-button {
+    font-size: 16px;
     height: 40px;
     padding: 8px 24px;
     background: white;
@@ -1332,10 +1352,20 @@ textarea {
 }
 
 .section-tip {
-    color: #666;
+    color: #555;
     font-size: 14px;
     margin: 8px 0 16px 0;
     font-style: italic;
+}
+
+.app-tip {
+font-size: 0.875rem;
+color: var(--text-secondary);
+background: #F3F4F6;
+padding: 0.75rem;
+border-radius: 0.375rem;
+margin-bottom: 1rem;
+border-left: 4px solid var(--tiffany-blue);
 }
 
 /* Hero Section */
@@ -1496,7 +1526,11 @@ textarea {
 }
 .date-field-row .add-date-button {
     margin-top: 8px; /* Add margin to separate the button from the inputs */
+    max-width: 200px; /* Set a maximum width */
+    width: 100%; /* Ensure it takes full width up to the max-width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
+
 @media (max-width: 480px) {
     .date-field-row {
         flex-direction: column; /* Stack items vertically on small screens */
@@ -1520,6 +1554,9 @@ textarea {
     height: 40px;
     white-space: nowrap;
     margin-left: 2px; /* Added margin to the left of the button */
+    max-width: 200px; /* Set a maximum width */
+    width: 100%; /* Ensure it takes full width up to the max-width */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 .range-inputs .date-field-row > div {
@@ -1669,3 +1706,49 @@ textarea {
     align-items: center;
 }
 
+.date-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+.date-display {
+    flex-grow: 1;
+}
+.action-button.delete {
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+/* Event Input Fields */
+.event-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    color: var(--text-primary);
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.event-input:focus {
+    outline: none;
+    border-color: var(--tiffany-blue);
+}
+/* Date Input Field */
+.date-input-field {
+    max-width: 200px; /* Set a maximum width */
+    width: 100%; /* Ensure it takes full width up to the max-width */
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    color: var(--text-primary);
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+.date-input-field:focus {
+    outline: none;
+    border-color: var(--tiffany-blue);
+}

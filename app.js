@@ -1,4 +1,4 @@
-// app.js 12/4/2024
+// app.js 12/9/2024
 import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
 import { 
@@ -7,6 +7,7 @@ import {
     set, 
     push,
     get,
+    update,
     onValue,
     remove
 } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
@@ -52,6 +53,9 @@ function getUserRef() {
 }
 
 function formatDateForDisplay(dateStr, timeStr, timezone) {
+    // Log input parameters
+    console.log('formatDateForDisplay called with:', { dateStr, timeStr, timezone });
+
     let date;
     if (timeStr) {
         date = new Date(`${dateStr}T${timeStr}:00`);
@@ -59,18 +63,51 @@ function formatDateForDisplay(dateStr, timeStr, timezone) {
         date = new Date(`${dateStr}T00:00:00`); // Use local time zone
     }
 
+    // Log the created date object
+    console.log('Created Date object:', date);
+
     if (isNaN(date.getTime())) {
+        console.log('Invalid Date detected.');
         return 'Invalid Date';
     }
 
-    return new Intl.DateTimeFormat('en-US', {
+    const options = {
+        weekday: 'long',
         month: '2-digit',
         day: '2-digit',
         year: '2-digit',
         hour: timeStr ? '2-digit' : undefined,
         minute: timeStr ? '2-digit' : undefined,
         timeZone: timezone
-    }).format(date);
+    };
+
+    // Log the formatting options
+    console.log('Intl.DateTimeFormat options:', options);
+
+    const formatter = new Intl.DateTimeFormat('en-US', options);
+    const parts = formatter.formatToParts(date);
+    
+    // Build custom format with '-' separator
+    const dateParts = parts.reduce((acc, part) => {
+        if (part.type === 'weekday') {
+            acc.weekday = part.value;
+        } else if (part.type === 'month' || part.type === 'day' || part.type === 'year') {
+            acc.date.push(part.value);
+        } else if (part.type === 'hour' || part.type === 'minute') {
+            acc.time.push(part.value);
+        }
+        return acc;
+    }, { weekday: '', date: [], time: [] });
+
+    let formattedDate = `${dateParts.weekday}, ${dateParts.date.join('-')}`;
+    if (timeStr) {
+        formattedDate += `, ${dateParts.time.join(':')}`;  // Added comma before time
+    }
+
+    // Log the final formatted date
+    console.log('Formatted Date:', formattedDate);
+
+    return formattedDate;
 }
 function sortPeopleArray(people) {
     return Object.entries(people)
@@ -304,6 +341,85 @@ function toggleMobileMenu() {
 }
 
 // Event Management Functions
+function getEventDetailsData() {
+    // Convert time selects to 24-hour format time string
+    function getTimeString(hourId, minuteId, periodId) {
+        if (!document.getElementById(hourId).value) return null;
+        
+        let hour = parseInt(document.getElementById(hourId).value);
+        const minute = document.getElementById(minuteId).value;
+        const period = document.getElementById(periodId).value;
+
+        if (period === 'PM' && hour !== 12) {
+            hour += 12;
+        } else if (period === 'AM' && hour === 12) {
+            hour = 0;
+        }
+
+        return `${hour.toString().padStart(2, '0')}:${minute}`;
+    }
+
+    return {
+        location: document.getElementById('eventLocation').value.trim() || null,
+        locationAddress: document.getElementById('eventLocationAddress').value.trim() || null,
+        locationUrl: document.getElementById('eventLocationUrl').value.trim() || null,
+        startDate: document.getElementById('eventStartDate').value,
+        endDate: document.getElementById('eventEndDate').value || null,
+        startTime: getTimeString('eventStartTimeHour', 'eventStartTimeMinute', 'eventStartTimePeriod'),
+        endTime: getTimeString('eventEndTimeHour', 'eventEndTimeMinute', 'eventEndTimePeriod'),
+        attire: document.getElementById('eventAttire').value,
+        attireComments: document.getElementById('eventAttireComments').value.trim() || null,
+        food: document.getElementById('eventFood').value.trim(),
+        additionalComments: document.getElementById('eventAdditionalComments').value.trim() || null
+    };
+}
+
+function setEventDetailsData(details) {
+    if (!details) return;
+    
+    // Helper function to set time selects
+    function setTimeFields(timeStr, hourId, minuteId, periodId) {
+        if (!timeStr) return;
+        
+        const [hours24, minutes] = timeStr.split(':');
+        let hours = parseInt(hours24);
+        let period = 'AM';
+        
+        if (hours >= 12) {
+            period = 'PM';
+            if (hours > 12) hours -= 12;
+        } else if (hours === 0) {
+            hours = 12;
+        }
+        
+        document.getElementById(hourId).value = hours.toString().padStart(2, '0');
+        document.getElementById(minuteId).value = minutes;
+        document.getElementById(periodId).value = period;
+    }
+    
+    document.getElementById('eventLocation').value = details.location || '';
+    document.getElementById('eventLocationAddress').value = details.locationAddress || '';
+    document.getElementById('eventLocationUrl').value = details.locationUrl || '';
+    document.getElementById('eventStartDate').value = details.startDate || '';
+    document.getElementById('eventEndDate').value = details.endDate || '';
+    setTimeFields(details.startTime, 'eventStartTimeHour', 'eventStartTimeMinute', 'eventStartTimePeriod');
+    setTimeFields(details.endTime, 'eventEndTimeHour', 'eventEndTimeMinute', 'eventEndTimePeriod');
+    document.getElementById('eventAttire').value = details.attire || '';
+    document.getElementById('eventAttireComments').value = details.attireComments || '';
+    document.getElementById('eventFood').value = details.food || '';
+    document.getElementById('eventAdditionalComments').value = details.additionalComments || '';
+}
+function validateEventPageSettings() {
+    const includeEventDetails = document.getElementById('includeEventDetails').checked;
+    const includeDatePreferences = document.getElementById('includeDatePreferences').checked;
+    const includeLocationPreferences = document.getElementById('includeLocationPreferences').checked;
+
+    if (!includeEventDetails && !includeDatePreferences && !includeLocationPreferences) {
+        alert('Reminder: If you do not include any event page sections in the Event Page Settings, nothing will be shown on your event page to attendees.');
+        return false;
+    }
+    return true;
+}
 async function createEvent(e) {
     e.preventDefault();
     if (!currentUser) {
@@ -316,13 +432,20 @@ async function createEvent(e) {
         alert('Please select a tribe for this event');
         return;
     }
+    // Validate event page settings
+    if (!validateEventPageSettings()) {
+        return;
+    }
 
     const eventData = {
         title: document.getElementById('eventTitle').value,
         description: document.getElementById('eventDescription').value,
+        eventDetails: getEventDetailsData(),  // Add this line
         type: document.querySelector('input[name="eventType"]:checked').value,
+        includeEventDetails: document.getElementById('includeEventDetails').checked,
         includeDatePreferences: document.getElementById('includeDatePreferences').checked,
-        includeLocationPreferences: document.getElementById('includeLocationPreferences').checked, // Always read the current state of the checkbox
+        includeLocationPreferences: document.getElementById('includeLocationPreferences').checked, 
+        
          dates: selectedDates.map(dateRange => {
             if (dateRange.type === 'dayOfWeek') {
                 return {
@@ -404,6 +527,7 @@ function resetCreateEventForm() {
     renderDates();
     renderLocations();
 }
+
 function resetEventForm() {
     document.getElementById('eventForm').reset();
     selectedDates = [];
@@ -414,6 +538,8 @@ function resetEventForm() {
     document.getElementById('eventTitle').value = '';
     document.getElementById('eventDescription').value = '';
     document.getElementById('tribeSelect').value = '';
+    // Clear event details fields
+    setEventDetailsData({});
 
 }
 
@@ -492,15 +618,15 @@ async function updateLocation() {
     const imageFile = document.getElementById('locationImage').files[0];
 
     if (!name) {
-        alert('Location name is required');
+        alert('Location name is required.');
         return;
     }
 
     let imageUrl = selectedLocations[editingLocationIndex].imageUrl; // Keep existing image if no new one
     if (imageFile) {
-        // Upload new image and get URL
-        const storageRef = ref(storage, `locations/${currentUser.uid}/${imageFile.name}`);
-        const snapshot = await uploadBytes(storageRef, imageFile);
+        // Upload new image to Firebase Storage
+              const imageRef = storageRef(storage, `locations/${imageFile.name}`);
+        const snapshot = await uploadBytes(imageRef, imageFile);
         imageUrl = await getDownloadURL(snapshot.ref);
     }
 
@@ -513,8 +639,10 @@ async function updateLocation() {
 
     // Update database if editing an event
     if (editingEventId) {
-        const eventRef = ref(database, `${getUserRef()}/events/${editingEventId}/locations`);
-        await set(eventRef, selectedLocations);
+        const eventRef = ref(database, `${getUserRef()}/events/${editingEventId}`);
+        await update(eventRef, {
+            locations: selectedLocations
+        });
     }
 
     resetLocationForm();
@@ -703,7 +831,7 @@ function renderEventsList(events) {
         return `
             <div class="event-row" onclick="showEventDetail('${eventId}')">
                 <div class="event-info">
-                    <div class="event-icon">
+                    <div class="event-actions">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <polyline points="7 10 12 15 17 10"></polyline>
                         </svg>
@@ -791,8 +919,8 @@ async function showEventDetail(eventId) {
         
         // Combine event data with tribe info
         eventData.tribeInfo = tribes[eventData.tribeId] || { name: 'Unknown Group' };
-// Ensure size is included in tribeInfo
-eventData.tribeInfo.size = eventData.tribeInfo.members.length;
+        // Ensure size is included in tribeInfo
+        eventData.tribeInfo.size = eventData.tribeInfo.members.length;
         // Ensure dates and locations are arrays
         eventData.dates = eventData.dates || [];
         eventData.locations = eventData.locations || [];
@@ -834,22 +962,29 @@ eventData.tribeInfo.size = eventData.tribeInfo.members.length;
         }
     }
 }
-
 function formatDateRange(startDate, endDate) {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
+    // Parse the dates as UTC
+    const start = new Date(`${startDate}T00:00:00Z`);
+    const end = new Date(`${endDate}T00:00:00Z`);
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     
-    const startDay = days[start.getDay()];
-    const endDay = days[end.getDay()];
-    const startFormatted = start.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' });
-    const endFormatted = end.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' });
-    
+    console.log('Original Start Date:', startDate);
+    console.log('Original End Date:', endDate);
+    console.log('Parsed Start Date:', start.toISOString());
+    console.log('Parsed End Date:', end.toISOString());
+
+    const startDay = days[start.getUTCDay()];
+    const endDay = days[end.getUTCDay()];
+    const startFormatted = `${(start.getUTCMonth() + 1).toString().padStart(2, '0')}-${start.getUTCDate().toString().padStart(2, '0')}-${start.getUTCFullYear()}`;
+    const endFormatted = `${end.getUTCMonth() + 1}-${end.getUTCDate()}-${end.getUTCFullYear()}`.replace(/\b(\d)\b/g, '0$1');    console.log('Formatted Start Date:', startFormatted);
+    console.log('Formatted End Date:', endFormatted);
+
     if (startDate === endDate) {
         return `${startDay}, ${startFormatted}`;
     }
     return `${startDay}, ${startFormatted} to ${endDay}, ${endFormatted}`;
 }
+
 
 function renderVotesSummary(eventData) {
     const votes = eventData.votes || {};
@@ -884,11 +1019,18 @@ function renderVotesSummary(eventData) {
     const maxYesVotes = Math.max(...votesByDate.map(v => v.yesVotes));
 
     return votesByDate.map((vote, index) => {
+        console.log(`Processing vote for date index ${index}:`, vote);
+
         const displayDate = vote.date.start === vote.date.end ?
             (eventData.type === 'specific' && vote.date.time ? 
-                formatDateForDisplay(vote.date.start, vote.date.time, document.getElementById('profileTimezone').value) :
-                formatDateRange(vote.date.start, vote.date.end)) :
-            formatDateRange(vote.date.start, vote.date.end);
+                (console.log('Calling formatDateForDisplay for specific date with time'), 
+                 formatDateForDisplay(vote.date.start, vote.date.time, document.getElementById('profileTimezone').value)) :
+                (console.log('Calling formatDateRange for single date without time'), 
+                 formatDateRange(vote.date.start, vote.date.end))) :
+            (console.log('Calling formatDateRange for multi-day range'), 
+             formatDateRange(vote.date.start, vote.date.end));
+
+        console.log(`Display Date for vote index ${index}: ${displayDate}`);
 
         return `
 <div class="vote-card ${vote.yesVotes === maxYesVotes && vote.yesVotes > 0 ? 'most-voted' : ''}">
@@ -897,33 +1039,30 @@ function renderVotesSummary(eventData) {
     </div>
     <div class="vote-stats">
         <div class="stat-item yes-votes">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
-            </svg>
+           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                          <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/>
+                        </svg>
             ${vote.yesVotes}
         </div>
         <div class="stat-item no-votes">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-               <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
-            </svg>
-            ${vote.noVotes}
+             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                           <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/>
+                        </svg>
+  ${vote.noVotes}
         </div>
         <div class="stat-item no-response">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M9.5 9a3 3 0 0 1 5 1c0 2-3 3-3 3"/>
-                <circle cx="12" cy="17" r="1"/> 
-            </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                           <circle cx="12" cy="12" r="10"/>
+                    <path d="M9.5 9a3 3 0 0 1 5 1c0 2-3 3-3 3"/>
+                    <circle cx="12" cy="17" r="1"/> 
+                        </svg>
+
             ${vote.noResponseCount}
         </div>
     </div>
     <div class="vote-details-button">
         <button class="vote-details-toggle" onclick="toggleVoteDetails('date-${index}')">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <path d="M12 16v-4"/>
-                <path d="M12 8h.01"/>
-            </svg>
+            <!-- SVG Icon -->
             Show Responses
         </button>
     </div>
@@ -935,9 +1074,9 @@ function renderVotesSummary(eventData) {
                     <span class="vote-type ${voter.vote}">${voter.vote}</span>
                 </div>
             `).join('')}
-                    </div>
-                </div>
-            </div>
+        </div>
+    </div>
+</div>
         `;
     }).join('');
 }
@@ -969,14 +1108,7 @@ function renderLocationVotesSummary(eventData) {
             <div class="vote-card ${voteCount === maxVotes && voteCount > 0 ? 'most-voted' : ''}">
                 <div class="vote-card-header">
                     <div class="location-name">${location.name}</div>
-                    <button class="vote-details-toggle" onclick="toggleVoteDetails('location-${index}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 16v-4"/>
-                            <path d="M12 8h.01"/>
-                        </svg>
-                        Show Details
-                    </button>
+                   
                 </div>
                 <div class="vote-stats">
                     <div class="stat-item total-votes">
@@ -987,6 +1119,14 @@ function renderLocationVotesSummary(eventData) {
                         ${voteCount}
                     </div>
                 </div>
+                 <button class="vote-details-toggle" onclick="toggleVoteDetails('location-${index}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 16v-4"/>
+                            <path d="M12 8h.01"/>
+                        </svg>
+                        Show Responses
+                    </button>
                 <div id="location-${index}" class="vote-details-panel">
                     <div class="voter-list">
                         ${votesForLocation.map(voter => `
@@ -1082,8 +1222,9 @@ function renderEventDetail(eventId, eventData) {
                         <line x1="8" y1="2" x2="8" y2="6"/>
                         <line x1="3" y1="10" x2="21" y2="10"/>
                     </svg>
-                    Dates
+                    Date Poll Summmary and Responses
                 </h3>
+                
                 <div class="votes-summary">
                     ${renderVotesSummary(eventData)}
                 </div>
@@ -1094,7 +1235,7 @@ function renderEventDetail(eventId, eventData) {
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
                     </svg>
-                    Locations
+                    Locations Poll Summmary and Responses
                 </h3>
                 <div class="votes-summary">
                     ${renderLocationVotesSummary(eventData)}
@@ -1197,6 +1338,7 @@ window.editEventDates = async function(eventId) {
         renderLocations();
         
         // Set includeDatePreferences and includeLocationPreferences checkboxes
+        document.getElementById('includeEventDetails').checked = eventData.includeEventDetails || false;
         document.getElementById('includeDatePreferences').checked = eventData.includeDatePreferences || false;
         document.getElementById('includeLocationPreferences').checked = eventData.includeLocationPreferences || false;
         
@@ -1216,8 +1358,8 @@ window.editEventDates = async function(eventId) {
             submitBtn.parentNode.insertBefore(cancelBtn, submitBtn);
         }
 
-        // Hide event detail view
-        document.getElementById('eventDetailView').style.display = 'none';
+        // Add this line to populate event details
+        setEventDetailsData(eventData.eventDetails);
     } catch (error) {
         console.error('Error loading event for editing:', error);
         alert('Error loading event for editing');
@@ -1736,8 +1878,8 @@ document.addEventListener('DOMContentLoaded', () => {
     renderEventSettings();
 });
 
+
 // Attach necessary functions to window object for HTML access
-5
 window.removeDate = async function(index) {
     if (confirm('Are you sure you want to delete this date? This action cannot be undone.')) {
         selectedDates.splice(index, 1);
@@ -1766,33 +1908,39 @@ function renderEventSettings() {
     const eventSettingsContainer = document.getElementById('eventSettingsContainer');
     const includeLocationPreferencesCheckbox = document.getElementById('includeLocationPreferences');
     const includeDatePreferencesCheckbox = document.getElementById('includeDatePreferences');
+    const includeEventDetailsCheckbox = document.getElementById('includeEventDetails');
 
     const includeLocationPreferences = selectedLocations.length > 0 || (includeLocationPreferencesCheckbox && includeLocationPreferencesCheckbox.checked);
     const includeDatePreferences = includeDatePreferencesCheckbox && includeDatePreferencesCheckbox.checked;
+    const includeEventDetails = includeEventDetailsCheckbox && includeEventDetailsCheckbox.checked;
 
     eventSettingsContainer.innerHTML = `
         <div class="section-card">
-            <h3>Group Event Page Settings</h3>
-             <p class="section-tip">Tip: Be sure to include the sections you need on your event page for users to see and respond to. Remove sections you are not using.</p>
-             <div class="form-group">
-                <label>Include on Group Event Page:</label>
+            <h3>Event Page Settings</h3>
+            <p class="section-tip">Important: Be sure to include the sections you need on your event page for users to see and respond to. Uncheck sections you're not using.</p>
+            <div class="form-group">
+                <label>Check to Include on Your Event Page:</label>
                 <div class="checkbox-grid">
+                     <label class="checkbox">
+                        <input type="checkbox" id="includeEventDetails" ${includeEventDetails ? 'checked' : ''}>
+                        <span class="checkmark"></span>
+                        Event Details Section
+                    </label>
                     <label class="checkbox">
                         <input type="checkbox" id="includeDatePreferences" ${includeDatePreferences ? 'checked' : ''}>
                         <span class="checkmark"></span>
-                        Date Section
+                        Date Poll Section
                     </label>
                     <label class="checkbox">
                         <input type="checkbox" id="includeLocationPreferences" ${includeLocationPreferences ? 'checked' : ''}>
                         <span class="checkmark"></span>
-                        Location Section
+                        Location Poll Section
                     </label>
                 </div>
             </div>
         </div>
     `;
 }
-
 // Call renderEventSettings when the page loads
 document.addEventListener('DOMContentLoaded', () => {
     // ...existing code...

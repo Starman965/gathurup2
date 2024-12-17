@@ -5,29 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>gatherUP - Getting Friends Together Easily™</title>
  <link rel="icon" href="gathurup.ico" type="image/x-icon">
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="gathurUP helps you get friends together easily by finding the best dates for everyone. No more endless text threads or confusing email chains.">
-    <meta name="keywords" content="gathurUP, event planning, group scheduling, find dates, get together, friends, social planning">
-    <meta name="author" content="Tiffanie and David Lewis">
+      <!-- SEO Meta Tags -->
+      <meta name="description" content="gathurUP helps you get friends together easily by finding the best dates for everyone. No more endless text threads or confusing email chains.">
+      <meta name="keywords" content="gathurUP, event planning, group scheduling, find dates, get together, friends, social planning">
+      <meta name="author" content="Tiffanie and David Lewis">
+      <head>
+    <!-- Open Graph Title -->
+    <meta property="og:title" content="gathurUP - For Getting Friends Together Easily" />
+  
+    <!-- Open Graph Description -->
+    <meta property="og:description" content="gathurUP helps you get friends together easily by finding the best dates for everyone. No more endless text threads or confusing email chains." />
+  
+    <!-- Open Graph URL -->
+    <meta property="og:url" content="https://www.gathurup.com" />
+  
+    <!-- Open Graph Image -->
+    <meta property="og:image" content="https://www.gathurup.com/gathurUP_teal_1200.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height="1200" />
+  
+    <!-- Open Graph Type -->
+    <meta property="og:type" content="website" />
     <link rel="stylesheet" href="styles.css">
     <script type="module" src="app.js"></script>
-    <style>
-        .date-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #ddd;
-        }
-        .date-display {
-            flex-grow: 1;
-        }
-        .action-button.delete {
-            background: none;
-            border: none;
-            cursor: pointer;
-        }
-    </style>
 </head>
 <body>
     
@@ -98,13 +98,13 @@
 
         <!-- Main Content Area -->
         <main class="main-content">
-                        <!-- Welcome View Content -->
-<div id="welcomeView" class="tab-content active">
-    <div class="content-header">
+        <!-- Welcome View Content -->
+        <div id="welcomeView" class="tab-content active">
+         <div class="content-header">
         <h1>Welcome to gathurUP! 🎉</h1>
-    </div>
+        </div>
     
-    <div class="content-card welcome-card">
+<div class="content-card welcome-card">
         <div class="welcome-section">
             <h2>Howdy, Friend! 👋</h2>
             <p>We're thrilled to have you as a founding user! To say "Thank You" we made you a Free Member.</p>
@@ -168,15 +168,154 @@
 
                         <div class="form-group">
                             <label for="eventTitle">Event Title</label>
-                            <input type="text" id="eventTitle" required placeholder="Enter event title">
+                            <input type="text" id="eventTitle" class="event-input" required placeholder="Enter event title">
                         </div>
 
                         <div class="form-group">
                             <label for="eventDescription">Description</label>
-                            <textarea id="eventDescription" placeholder="Enter event description"></textarea>
+                            <textarea id="eventDescription" class="event-input" placeholder="Enter event description"></textarea>
                         </div>
-
                         <!-- Collapsible Sections -->
+                        <!-- Event Details Section -->
+                        <div class="section-card">
+                            <button type="button" class="collapsible">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                                </svg>
+                                Event Details
+                            </button>
+                            <div class="content">
+                                <h3>Event Details</h3>
+                                <p class="app-tip">Tip: You can poll for dates and locations to find the best date(s), time(s), and locations.</p>
+                                <div class="form-group">
+                                    <label for="eventLocation">Location</label>
+                                    <input type="text" id="eventLocation" class="event-input" placeholder="Restaurant, Hotel, Venue, etc.">
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventLocationAddress">Location Address</label>
+                                    <input type="text" id="eventLocationAddress" class="event-input" placeholder="Street Address, City, State, Zip">
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventLocationUrl">Location Website</label>
+                                    <input type="url" id="eventLocationUrl" class="event-input" placeholder="Enter as http:// or https://www.example.com">
+                                </div>
+                                <div class="date-field-row">
+                                    <div>
+                                        <label for="eventStartDate">Start Date</label>
+                                        <input type="date" id="eventStartDate" class="date-input-field">
+                                    </div>
+                                    <div>
+                                        <label for="eventEndDate">End Date</label>
+                                        <input type="date" id="eventEndDate" class="date-input-field">
+                                    </div>
+                                </div>
+                                <div class="date-field-row">
+                                    <div>
+                                        <label for="eventStartTime">Start Time</label>
+                                        <div class="time-inputs">
+                                            <div class="time-input">
+                                                <label>H</label>
+                                                <select id="eventStartTimeHour">
+                                                    <option value="08" selected>08</option>
+                                                    <option value="09">09</option>
+                                                    <option value="10">10</option>
+                                                    <option value="11">11</option>
+                                                    <option value="12">12</option>
+                                                    <option value="01">01</option>
+                                                    <option value="02">02</option>
+                                                    <option value="03">03</option>
+                                                    <option value="04">04</option>
+                                                    <option value="05">05</option>
+                                                    <option value="06">06</option>
+                                                    <option value="07">07</option>
+                                                </select>
+                                            </div>
+                                            <div class="time-input">
+                                                <label>M</label>
+                                                <select id="eventStartTimeMinute">
+                                                    <option value="00">00</option>
+                                                    <option value="15">15</option>
+                                                    <option value="30">30</option>
+                                                    <option value="45">45</option>
+                                                </select>
+                                            </div>
+                                            <div class="time-input">
+                                                <label>AM/PM</label>
+                                                <select id="eventStartTimePeriod">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label for="eventEndTime">End Time</label>
+                                        <div class="time-inputs">
+                                            <div class="time-input">
+                                                <label>H</label>
+                                                <select id="eventEndTimeHour">
+                                                    <option value="08" selected>08</option>
+                                                    <option value="09">09</option>
+                                                    <option value="10">10</option>
+                                                    <option value="11">11</option>
+                                                    <option value="12">12</option>
+                                                    <option value="01">01</option>
+                                                    <option value="02">02</option>
+                                                    <option value="03">03</option>
+                                                    <option value="04">04</option>
+                                                    <option value="05">05</option>
+                                                    <option value="06">06</option>
+                                                    <option value="07">07</option>
+                                                </select>
+                                            </div>
+                                            <div class="time-input">
+                                                <label>M</label>
+                                                <select id="eventEndTimeMinute">
+                                                    <option value="00">00</option>
+                                                    <option value="15">15</option>
+                                                    <option value="30">30</option>
+                                                    <option value="45">45</option>
+                                                </select>
+                                            </div>
+                                            <div class="time-input">
+                                                <label>AM/PM</label>
+                                                <select id="eventEndTimePeriod">
+                                                    <option value="AM">AM</option>
+                                                    <option value="PM">PM</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventAttire">Attire</label>
+                                    <select id="eventAttire" class="event-input max-width-200">>
+                                        <option value="">Select Attire...</option>
+                                        <option value="athletic">Athletic</option>
+                                        <option value="casual">Casual</option>
+                                        <option value="business-casual">Business Casual</option>
+                                        <option value="business">Business</option>
+                                        <option value="formal">Formal</option>
+                                        <option value="black-tie">Black Tie</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventAttireComments">Attire Comments</label>
+                                    <textarea id="eventAttireComments" class="event-input" placeholder="Optional"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventFood">Food</label>
+                                    <textarea id="eventFood" class="event-input" placeholder="Describe cuisine or dietary information"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventAdditionalComments">Additional Comments</label>
+                                    <textarea id="eventAdditionalComments" class="event-input" placeholder="Add any additional event details for attendees"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                       <!-- Date Poll Section -->
                         <div class="section-card">
                             <button type="button" class="collapsible">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -185,12 +324,12 @@
                                     <line x1="8" y1="2" x2="8" y2="6"/>
                                     <line x1="3" y1="10" x2="21" y2="10"/>
                                 </svg>
-                                Dates
+                                Date Poll
                             </button>
                             <div class="content">
                                 <div class="event-type">
                                     <h3>Find Your Ideal Dates</h3>
-                                    <p class="section-tip">Tip: Choose Single-Day Events for events that happen within a day. Selet Multi-Day Events for events that occur over multiple days. Start times can only be added to Single-Day events.</p>
+                                    <p class="app-tip">Tip: Choose Single-Day Events for events that happen within a day. Selet Multi-Day Events for events that occur over multiple days. Start times can only be added to Single-Day events.</p>
                                     <label class="radio-label">
                                         <input type="radio" name="eventType" value="specific" checked>
                                         Single-Day Events
@@ -212,7 +351,7 @@
                                         <div class="date-field-row">
                                             <div>
                                                 <label for="specificDateInput">Date</label>
-                                                <input type="date" id="specificDateInput">
+                                                <input type="date" id="specificDateInput" class="date-input-field">
                                             </div>
                                             <div id="timeFields" class="time-inputs" style="display: none;">
                                                 <div class="time-input">
@@ -264,7 +403,7 @@
                                                     <label for="endDateInput">End Date</label>
                                                     <input type="date" id="endDateInput">
                                                 </div>
-                                                <button type="button" id="addDateBtn" class="primary-button" onclick="addDate()">Add Option</button> 
+                                                <button type="button" id="addDateBtn" class="primary-button add-date-button" onclick="addDate()">Add Option</button> 
                                             </div>
                                         </div>
                                     </div>
@@ -277,26 +416,26 @@
                             </div>
                             
                         </div>
-
+                        <!-- Location Poll Section -->
                         <div class="section-card">
                             <button type="button" class="collapsible">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
                                 </svg>
-                                Location
+                                Location Poll
                             </button>
                             <div class="content">
                                 <h3>Find Your Ideal Location</h3>
-                                <p class="section-tip">Tip: Use Canva or ChatGPT to make location images. They should be 400px wide by 150px tall.</p>
+                                <p class="app-tip">Tip: Use Canva or ChatGPT to make location images. They should be landscape format and ideally 400px wide by 150px tall.</p>
                                 
                                 <!-- Add Location Form -->
                                 <div class="form-group">
                                     <label for="locationName">Location Name</label>
-                                    <input type="text" id="locationName" placeholder="Enter location name">
+                                    <input type="text" id="locationName" class="event-input" placeholder="Enter location name">
                                 </div>
                                 <div class="form-group">
                                     <label for="locationDescription">Location Description</label>
-                                    <textarea id="locationDescription" placeholder="Enter location description"></textarea>
+                                    <textarea id="locationDescription" class="event-input" placeholder="Enter location description"></textarea>
                                 </div>
                                 <div class="form-group">
                                     <label for="locationImage">Location Header</label>
@@ -310,26 +449,8 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="section-card">
-                            <button type="button" class="collapsible">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                                    <path d="M8 21v-4h8v4"></path>
-                                    <path d="M8 10h.01"></path>
-                                    <path d="M16 10h.01"></path>
-                                    <path d="M12 10h.01"></path>
-                                    <path d="M8 14h.01"></path>
-                                    <path d="M16 14h.01"></path>
-                                    <path d="M12 14h.01"></path>
-                                </svg>
-                                Hotel
-                            </button>
-                            <div class="content">
-                                <p>When available, this section will enable admins to suggest various hotel options for the group to vote on their hotel preference.</p>
-                            </div>
-                        </div>
-                        <div class="section-card">
+                        <!-- Budget Poll Section -->
+                         <div class="section-card">
                             <button type="button" class="collapsible">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <line x1="12" y1="1" x2="12" y2="23"></line>
@@ -338,10 +459,11 @@
                                 Budget
                             </button>
                             <div class="content">
-                                <p>This section will enable admins to suggest various budget ranges to gauge the groups preferences on a personal budget for attending the event in order to help plan hotels and activities.</p>
+                                <p>This section will enable you to suggest various budget ranges to gauge the groups preferences on a personal budget for attending the event.</p>
                             </div>
                         </div>
-                        <div class="section-card">
+                        <!-- Assignments Section -->
+                         <div class="section-card">
                             <button type="button" class="collapsible">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M9 2H15V4H9z"></path>
@@ -356,6 +478,7 @@
                                 <p> This section will enable the admin to assign "Things to Bring" and "Things to Do" for group members like someone bringing dessert and somone renting a car.</p>
                             </div>
                         </div>
+                       <!-- Activities Section -->
                         <div class="section-card">
                             <button type="button" class="collapsible">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -370,7 +493,7 @@
                                 <p>Activities collaboration will enable groups to suggest and build itineraries together like dining, hikes, tours, biking, fishing, etc..</p>
                             </div>
                         </div>
-                        
+                        <!-- Packing Section -->
                         <div class="section-card">
                             <button type="button" class="collapsible">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -383,9 +506,8 @@
                                 <p>Packing list collaboration wiil enable admins and group members to suggest items to pack on trips.</p>
                             </div>
                         </div>
-
+                        <!-- Event Settings Section -->
                         <div id="eventSettingsContainer"></div>
-
                         <div class="submit-container">
                             <button type="submit" class="primary-button">Create Event</button>
                         </div>
@@ -398,7 +520,8 @@
                 <div class="content-header">
                     <h1>Events</h1>
                 </div>
-                
+                 <!-- Tip Section -->
+                <p class="app-tip">Tip: Use this section to manage your events. You can view poll results, edit, and delete events as needed. Refresh the page if you don't see your events.</p>
                 <div class="events-list-container">
                     <div class="events-list">
                         <div class="events-table-header" id="eventsTableHeader">
@@ -424,7 +547,7 @@
     <div class="section-content active" id="peopleSection">
     <div class="section-container">
         <h2>People</h2>
-        <p class="section-tip">Tip: Add yourself first, then add each of your friends you plan to invite to various gatherings.</p>
+        <p class="app-tip">Tip: Add yourself first, then add each of your friends you plan to invite to various gatherings.</p>
         <form id="personForm" class="add-person-form">
             <input type="text" id="personName" placeholder="Enter full name" required maxlength="50">
             <button type="submit" class="primary-button">
@@ -608,47 +731,6 @@
             <h3>Danger Zone</h3>
             <p class="warning-text">Once you delete your account, there is no going back. Please be certain.</p>
             <button id="deleteAccountBtn" class="delete-account-button">Delete Account</button>
-        </div>
-    </div>
-</div>
-
-<!-- Event Detail View -->
-<div id="eventDetailView" class="tab-content">
-    <div class="content-header">
-        <h1>Event Details</h1>
-    </div>
-    <div class="content-card">
-        <div id="eventDetail">
-            <!-- Event details will be dynamically populated here -->
-        </div>
-        <div class="section-card">
-            <button type="button" class="collapsible">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                Dates
-            </button>
-            <div class="content">
-                <div id="eventDatesList" class="dates-list">
-                    <!-- Dates votes summary will be dynamically populated here -->
-                </div>
-            </div>
-        </div>
-        <div class="section-card">
-            <button type="button" class="collapsible">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 10.5a8.38 8.38 0 0 1-1.9.5 4.15 4.15 0 0 0 1.8-2.3 8.27 8.27 0 0 1-2.6 1 4.13 4.13 0 0 0-7 3.8 11.7 11.7 0 0 1-8.5-4.3 4.13 4.13 0 0 0 1.3 5.5 4.1 4.1 0 0 1-1.9-.5v.1a4.13 4.13 0 0 0 3.3 4 4.1 4.1 0 0 1-1.9.1 4.13 4.13 0 0 0 3.8 2.8 8.3 8.3 0 0 1-5.1 1.8 11.7 11.7 0 0 0 6.3 1.8c7.5 0 11.6-6.2 11.6-11.6v-.5a8.3 8.3 0 0 0 2-2.1z"/>
-                </svg>
-                Locations
-            </button>
-            <div class="content">
-                <div id="eventLocationsList" class="location-list">
-                    <!-- Locations votes summary will be dynamically populated here -->
-                </div>
-            </div>
         </div>
     </div>
 </div>

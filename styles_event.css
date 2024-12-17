@@ -84,7 +84,7 @@ body {
     max-width: 150px; /* Set a maximum width */
     width: auto; /* Ensure it adjusts to content */
 }
-/* Modern Select */
+
 .modern-select {
     width: 100%;
     padding: 0.5rem;
@@ -96,10 +96,13 @@ body {
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="%239CA3AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-down"><path d="M6 9l6-6 6 6"/></svg>');
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='%239CA3AF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
-    background-position: right 0.75rem center;
-    background-size: 1rem;
+    max-width: 100%; /* Ensure it takes full width but not more */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
+    padding-right: 2rem; /* Increase right padding to make room for chevron */
+    background-position: right 0.75rem center; /* Move chevron slightly more inward */
+
 }
 
 .modern-select:focus {
@@ -373,8 +376,9 @@ body {
     background: white;
     padding: 2rem;
     border-radius: 0.5rem;
-    max-width: 24rem;
+    max-width: 24rem; /* Ensure the container is not too wide */
     width: 90%;
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
 /* Response Summary Card */
@@ -396,7 +400,7 @@ body {
 
 .response-summary-card p {
     font-size: 0.875rem;
-    color: var(--text-secondary);
+    color: var (--text-secondary);
     margin: 0;
 }
 
@@ -856,4 +860,133 @@ body {
     justify-content: center;
     text-align: center;
     padding: 2rem;
+}
+
+/* Event Details Card */
+.event-details-card {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+.event-details-card h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+}
+
+.event-details-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+}
+
+.detail-icon {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    background: #F3F4F6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+}
+
+.detail-icon svg {
+    width: 24px;
+    height: 24px;
+}
+
+.detail-content {
+    flex: 1;
+}
+
+.detail-content h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.25rem 0;
+}
+
+.detail-content p {
+    margin: 0;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.detail-content .secondary-text {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.location-link {
+    display: inline-block;
+    color: var(--tiffany-blue);
+    text-decoration: none;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.location-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+    .event-details-card {
+        padding: 1rem;
+    }
+
+    .detail-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .detail-icon svg {
+        width: 20px;
+        height: 20px;
+    }
+}
+.location-link {
+    display: inline-block;
+    color: var(--tiffany-blue);
+    text-decoration: none;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.location-link:hover {
+    text-decoration: underline;
+}
+
+.location-link svg {
+    vertical-align: middle;
+    margin-right: 5px;
+}
+
+@media (max-width: 640px) {
+    .event-details-card {
+        padding: 1rem;
+    }
+
+    .detail-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .detail-icon svg {
+        width: 20px;
+        height: 20px;
+    }
 }
