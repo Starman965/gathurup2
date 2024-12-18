@@ -415,11 +415,26 @@ function validateEventPageSettings() {
     const includeLocationPreferences = document.getElementById('includeLocationPreferences').checked;
 
     if (!includeEventDetails && !includeDatePreferences && !includeLocationPreferences) {
-        alert('Reminder: If you do not include any event page sections in the Event Page Settings, nothing will be shown on your event page to attendees.');
+        alert('You must include at least one section on your event page.');
         return false;
     }
+
+    if (includeEventDetails) {
+        const location = document.getElementById('eventLocation').value.trim();
+        const startDate = document.getElementById('eventStartDate').value;
+        const startTimeHour = document.getElementById('eventStartTimeHour').value;
+        const startTimeMinute = document.getElementById('eventStartTimeMinute').value;
+        const startTimePeriod = document.getElementById('eventStartTimePeriod').value;
+
+        if (!location || !startDate || !startTimeHour || !startTimeMinute || !startTimePeriod) {
+            alert('Please complete the Location, Start Date, and Start Time fields in the Event Details section.');
+            return false;
+        }
+    }
+
     return true;
 }
+
 async function createEvent(e) {
     e.preventDefault();
     if (!currentUser) {
