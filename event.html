@@ -25,6 +25,7 @@
    
    <link rel="stylesheet" href="styles_event.css">
    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.3.0/luxon.min.js"></script>
+   <script src="https://cdn.jsdelivr.net/npm/add-to-calendar-button@2" async defer></script>
     <script src="events.js" type="module"></script>
 </head>
 <body>
@@ -50,7 +51,7 @@
             </div>
         </div>
 
-                <!-- Event Details Card -->
+        <!-- Event Details Card -->
         <div id="eventDetailsCard" class="event-details-card" style="display: none;">
             <h2>Event Details</h2>
             <div class="event-details-content">
@@ -162,11 +163,11 @@
                         <p id="eventAdditionalComments"></p>
                     </div>
                 </div>
-        
-                <!-- Add to Calendar Button -->
-                <div class="detail-item">
-                    <button id="addToCalendarButton" class="submit-button">Add to Calendar</button>
-                </div>
+    
+            <!-- Add to Calendar Container -->
+            <div id="addToCalendarContainer">
+                <button id="addToCalendarButton" class="submit-button">Add to Calendar</button>
+            </div>
             </div>
         </div>
 

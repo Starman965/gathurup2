@@ -21,6 +21,7 @@ let currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 let eventData = null;
 let eventTimezoneCache = {};
 
+
 // Timezone Management
 async function initializeEventTimezone() {
     const urlParams = new URLSearchParams(window.location.search);
@@ -1056,3 +1057,45 @@ document.getElementById('addToCalendarButton').addEventListener('click', functio
     const calendarLink = generateCalendarLink(eventData);
     window.open(calendarLink, '_blank');
 });
+// Function to extract event and user parameters from URL
+function getEventAndUserFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+        event: urlParams.get('event'),
+        user: urlParams.get('user')
+    };
+}
+
+// Function to show Add to Calendar button
+function showAddToCalendarButton(eventToken) {
+    get(ref(database, `schedule/${eventToken}`)).then((snapshot) => {
+        const event = snapshot.val();
+        if (event) {
+            const calendarContainer = document.getElementById('addToCalendarContainer');
+            calendarContainer.innerHTML = `
+                <add-to-calendar-button
+                    name="${event.name}"
+                    description="${event.description}"
+                    startDate="${event.date}"
+                    startTime="${event.startTime}"
+                    endTime="${event.endTime}"
+                    timeZone="${event.timeZone}"
+                    location="${event.location}"
+                    options="'Apple','Google','iCal','Microsoft365','Outlook.com','Yahoo'"
+                    lightMode="dark"
+                ></add-to-calendar-button>
+            `;
+            calendarContainer.style.display = 'block';
+        }
+    }).catch((error) => {
+        console.error('Error fetching event details:', error);
+    });
+}
+
+// Extract event and user parameters from URL and call the function
+const { event, user } = getEventAndUserFromURL();
+if (event) {
+    showAddToCalendarButton(event);
+} else {
+    console.error('Event parameter not found in URL');
+}
