@@ -20,7 +20,7 @@ let locationVotes = {};
 let currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 let eventData = null;
 let eventTimezoneCache = {};
-
+let currentEventData = null;
 
 // Timezone Management
 async function initializeEventTimezone() {
@@ -714,6 +714,7 @@ function formatTime(time) {
     }
 }
 
+// Update timezone change handler
 function populateTimezoneSelect() {
     const timezoneSelect = document.getElementById('timezoneSelect');
     const timezones = [
@@ -732,10 +733,13 @@ function populateTimezoneSelect() {
         timezoneSelect.appendChild(option);
     });
 
-    // Add timezone change handler
+    // Single combined timezone change handler
     timezoneSelect.addEventListener('change', async function(e) {
         currentTimezone = e.target.value || Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const urlParams = new URLSearchParams(window.location.search);
+        if (currentEventData) {
+            currentEventData.eventDetails.timeZone = currentTimezone;
+            populateEventDetails(currentEventData);
+        }
         await loadEventData(); // Re-render dates with new timezone
     });
 }
@@ -889,14 +893,18 @@ function formatTimeString(timeStr) {
 }
 
 function populateEventDetails(eventData) {
+    currentEventData = eventData;
     const eventDetailsCard = document.getElementById('eventDetailsCard');
     if (!eventData.includeEventDetails || !eventData.eventDetails) {
         eventDetailsCard.style.display = 'none';
         return;
     }
 
-    // Show the card
     eventDetailsCard.style.display = 'block';
+
+    // Get timezone once for all uses
+    const timezone = eventData.eventDetails.timeZone || currentTimezone || 'America/Los_Angeles';
+    const timeZoneAbbr = luxon.DateTime.now().setZone(timezone).toFormat('ZZZZ');
 
     // Location Details
     const locationDetails = document.getElementById('locationDetails');
@@ -926,48 +934,63 @@ function populateEventDetails(eventData) {
         locationDetails.style.display = 'none';
     }
 
-    // Date Details
+    // Date and Time Details
     const dateDetails = document.getElementById('dateDetails');
     if (eventData.eventDetails.startDate) {
         dateDetails.style.display = 'flex';
-        const startDate = formatDateForDisplay(eventData.eventDetails.startDate, '', { 
-            weekday: 'long', 
-            month: 'long', 
-            day: 'numeric', 
-            year: 'numeric' 
-        });
-        const endDate = eventData.eventDetails.endDate ? 
-            formatDateForDisplay(eventData.eventDetails.endDate, '', {
-                weekday: 'long',
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric'
-            }) : '';
-        document.getElementById('eventDateRange').textContent = endDate ? 
-            `${startDate} to ${endDate}` : startDate;
+        const dateContent = document.querySelector('#dateDetails .detail-content');
+        
+        const isDateRange = eventData.eventDetails.endDate && 
+            eventData.eventDetails.endDate !== eventData.eventDetails.startDate;
 
-        // Populate hidden date inputs
-        document.getElementById('eventStartDate').value = eventData.eventDetails.startDate;
-        document.getElementById('eventEndDate').value = eventData.eventDetails.endDate || '';
+        // Convert dates/times to selected timezone
+        const startDateTime = luxon.DateTime.fromISO(
+            `${eventData.eventDetails.startDate}T${eventData.eventDetails.startTime || '00:00'}`
+        ).setZone(timezone);
+        
+        const endDateTime = luxon.DateTime.fromISO(
+            `${eventData.eventDetails.endDate || eventData.eventDetails.startDate}T${eventData.eventDetails.endTime || eventData.eventDetails.startTime || '00:00'}`
+        ).setZone(timezone);
+
+        const startDate = startDateTime.toFormat('EEEE, MMMM d, yyyy');
+        const startTime = eventData.eventDetails.startTime ? startDateTime.toFormat('h:mm a') : null;
+        const endDate = isDateRange ? endDateTime.toFormat('EEEE, MMMM d, yyyy') : null;
+        const endTime = eventData.eventDetails.endTime ? endDateTime.toFormat('h:mm a') : null;
+
+        dateContent.innerHTML = `
+            <h3>Date</h3>
+            ${isDateRange ? 
+                `<p>${startDate}</p>
+                 <p>Start Time: ${startTime} ${timeZoneAbbr}</p>
+                 <br>
+                 <p>${endDate}</p>
+                 <p>End Time: ${endTime} ${timeZoneAbbr}</p>` : 
+                `<p>${startDate}</p>`}
+            <input type="date" id="eventStartDate" value="${startDateTime.toFormat('yyyy-MM-dd')}" style="display: none;">
+            <input type="date" id="eventEndDate" value="${endDateTime.toFormat('yyyy-MM-dd')}" style="display: none;">
+        `;
+
+        // Time Details for single date
+        const timeDetails = document.getElementById('timeDetails');
+        if (isDateRange) {
+            timeDetails.style.display = 'none';
+        } else if (eventData.eventDetails.startTime) {
+            timeDetails.style.display = 'flex';
+            const timeContent = document.querySelector('#timeDetails .detail-content');
+            
+            timeContent.innerHTML = `
+                <h3>Time</h3>
+                ${endTime ? 
+                    `<p>${startTime} - ${endTime} ${timeZoneAbbr}</p>` : 
+                    `<p>${startTime} ${timeZoneAbbr}</p>`}
+                <input type="time" id="eventStartTime" value="${eventData.eventDetails.startTime}" style="display: none;">
+                <input type="time" id="eventEndTime" value="${eventData.eventDetails.endTime || ''}" style="display: none;">
+            `;
+        } else {
+            timeDetails.style.display = 'none';
+        }
     } else {
         dateDetails.style.display = 'none';
-    }
-
-    // Time Details
-    const timeDetails = document.getElementById('timeDetails');
-    if (eventData.eventDetails.startTime) {
-        timeDetails.style.display = 'flex';
-        const startTime = formatTimeString(eventData.eventDetails.startTime);
-        const endTime = eventData.eventDetails.endTime ? 
-            formatTimeString(eventData.eventDetails.endTime) : '';
-        document.getElementById('eventTimeRange').textContent = endTime ? 
-            `${startTime} to ${endTime}` : startTime;
-
-        // Populate hidden time inputs
-        document.getElementById('eventStartTime').value = eventData.eventDetails.startTime;
-        document.getElementById('eventEndTime').value = eventData.eventDetails.endTime || '';
-    } else {
-        timeDetails.style.display = 'none';
     }
 
     // Attire Details
@@ -1006,96 +1029,69 @@ function populateEventDetails(eventData) {
     } else {
         additionalDetails.style.display = 'none';
     }
-}
-function generateCalendarLink(eventData) {
-    const { title, description, startDate, endDate, startTime, endTime, location, createdInTimezone } = eventData;
 
-    // Use Luxon to handle time zone conversion
-    const startDateTime = luxon.DateTime.fromISO(`${startDate}T${startTime}`, { zone: createdInTimezone }).toUTC().toFormat("yyyyMMdd'T'HHmmss'Z'");
-    const endDateTime = luxon.DateTime.fromISO(`${endDate}T${endTime}`, { zone: createdInTimezone }).toUTC().toFormat("yyyyMMdd'T'HHmmss'Z'");
+    // Add to Calendar Button
+    if (eventData.eventDetails.startDate) {
+        const calendarContainer = document.getElementById('addToCalendarContainer');
+        const startDateTime = luxon.DateTime.fromISO(
+            `${eventData.eventDetails.startDate}T${eventData.eventDetails.startTime || '00:00'}`
+        ).setZone(timezone);
+        
+        const endDateTime = luxon.DateTime.fromISO(
+            `${eventData.eventDetails.endDate || eventData.eventDetails.startDate}T${eventData.eventDetails.endTime || eventData.eventDetails.startTime || '00:00'}`
+        ).setZone(timezone);
 
-    const googleCalendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${startDateTime}/${endDateTime}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(location)}&sf=true&output=xml`;
-
-    return googleCalendarUrl;
-}
-
-document.getElementById('addToCalendarButton').addEventListener('click', function() {
-    const eventTitleElement = document.getElementById('eventTitleDisplay');
-    const eventDescriptionElement = document.getElementById('eventDescription');
-    const eventStartDateElement = document.getElementById('eventStartDate');
-    const eventEndDateElement = document.getElementById('eventEndDate');
-    const eventStartTimeElement = document.getElementById('eventStartTime');
-    const eventEndTimeElement = document.getElementById('eventEndTime');
-    const eventLocationElement = document.getElementById('eventLocationName');
-
-    console.log('eventTitleElement:', eventTitleElement);
-    console.log('eventDescriptionElement:', eventDescriptionElement);
-    console.log('eventStartDateElement:', eventStartDateElement);
-    console.log('eventEndDateElement:', eventEndDateElement);
-    console.log('eventStartTimeElement:', eventStartTimeElement);
-    console.log('eventEndTimeElement:', eventEndTimeElement);
-    console.log('eventLocationElement:', eventLocationElement);
-
-    if (!eventTitleElement || !eventDescriptionElement || !eventStartDateElement || !eventEndDateElement || !eventStartTimeElement || !eventEndTimeElement || !eventLocationElement) {
-        console.error('One or more event detail elements are missing');
-        return;
+        calendarContainer.innerHTML = `
+            <add-to-calendar-button
+                name="${eventData.title}"
+                description="${eventData.description}"
+                startDate="${startDateTime.toFormat('yyyy-MM-dd')}"
+                startTime="${startDateTime.toFormat('HH:mm')}"
+                endDate="${endDateTime.toFormat('yyyy-MM-dd')}"
+                endTime="${endDateTime.toFormat('HH:mm')}"
+                timeZone="${timezone}"
+                location="${eventData.eventDetails.location || ''}"
+                options="'Apple','Google','iCal','Microsoft365','Outlook.com','Yahoo'"
+                lightMode="dark"
+            ></add-to-calendar-button>
+        `;
     }
-
-    const eventData = {
-        title: eventTitleElement.textContent,
-        description: eventDescriptionElement.textContent,
-        startDate: eventStartDateElement.value,
-        endDate: eventEndDateElement.value,
-        startTime: eventStartTimeElement.value,
-        endTime: eventEndTimeElement.value,
-        location: eventLocationElement.textContent,
-        createdInTimezone: 'America/Los_Angeles' // Replace with the actual time zone from your data
-    };
-
-    console.log('eventData:', eventData);
-
-    const calendarLink = generateCalendarLink(eventData);
-    window.open(calendarLink, '_blank');
-});
-// Function to extract event and user parameters from URL
-function getEventAndUserFromURL() {
-    const urlParams = new URLSearchParams(window.location.search);
-    return {
-        event: urlParams.get('event'),
-        user: urlParams.get('user')
-    };
 }
+// Add this new function
+function updateEventDetailsWithTimezone(timezone) {
+    if (!eventData || !eventData.eventDetails) return;
 
-// Function to show Add to Calendar button
-function showAddToCalendarButton(eventToken) {
-    get(ref(database, `schedule/${eventToken}`)).then((snapshot) => {
-        const event = snapshot.val();
-        if (event) {
-            const calendarContainer = document.getElementById('addToCalendarContainer');
-            calendarContainer.innerHTML = `
-                <add-to-calendar-button
-                    name="${event.name}"
-                    description="${event.description}"
-                    startDate="${event.date}"
-                    startTime="${event.startTime}"
-                    endTime="${event.endTime}"
-                    timeZone="${event.timeZone}"
-                    location="${event.location}"
-                    options="'Apple','Google','iCal','Microsoft365','Outlook.com','Yahoo'"
-                    lightMode="dark"
-                ></add-to-calendar-button>
-            `;
-            calendarContainer.style.display = 'block';
-        }
-    }).catch((error) => {
-        console.error('Error fetching event details:', error);
-    });
-}
+    const dateDetails = document.getElementById('dateDetails');
+    if (!dateDetails || !eventData.eventDetails.startDate) return;
 
-// Extract event and user parameters from URL and call the function
-const { event, user } = getEventAndUserFromURL();
-if (event) {
-    showAddToCalendarButton(event);
-} else {
-    console.error('Event parameter not found in URL');
+    const dateContent = document.querySelector('#dateDetails .detail-content');
+    const timeZoneAbbr = luxon.DateTime.now().setZone(timezone).toFormat('ZZZZ');
+    
+    const isDateRange = eventData.eventDetails.endDate && 
+        eventData.eventDetails.endDate !== eventData.eventDetails.startDate;
+
+    // Format start date and time in new timezone
+    const startDate = luxon.DateTime.fromISO(eventData.eventDetails.startDate)
+        .setZone(timezone)
+        .toFormat('EEEE, MMMM d, yyyy');
+    
+    const startTime = eventData.eventDetails.startTime ? 
+        luxon.DateTime.fromISO(`${eventData.eventDetails.startDate}T${eventData.eventDetails.startTime}`)
+            .setZone(timezone)
+            .toFormat('h:mm a') : 
+        null;
+
+    // Format end date and time if it's a range
+    const endDate = isDateRange ? 
+        luxon.DateTime.fromISO(eventData.eventDetails.endDate)
+            .setZone(timezone)
+            .toFormat('EEEE, MMMM d, yyyy') : 
+        null;
+    
+    const endTime = eventData.eventDetails.endTime ? 
+        luxon.DateTime.fromISO(`${eventData.eventDetails.endDate || eventData.eventDetails.startDate}T${eventData.eventDetails.endTime}`)
+            .setZone(timezone)
+            .toFormat('h:mm a') : 
+        null;
+
 }

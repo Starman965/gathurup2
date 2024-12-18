@@ -912,17 +912,25 @@ body {
     flex: 1;
 }
 
+/* Update the detail-content styles */
 .detail-content h3 {
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 0.25rem 0;
+    margin: 0 0 0.5rem 0;
 }
 
 .detail-content p {
-    margin: 0;
+    margin: 0 0 0.25rem 0;
     color: var(--text-primary);
     line-height: 1.5;
+}
+
+/* Add specific styles for date and time details */
+#dateDetails .detail-content p,
+#timeDetails .detail-content p {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
 }
 
 .detail-content .secondary-text {
@@ -989,15 +997,4 @@ body {
         width: 20px;
         height: 20px;
     }
-}
-#addToCalendarContainer {
-    display: flex;
-    justify-content: center;
-    margin-top: 20px;
-}
-
-#addToCalendarButton {
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
 }
