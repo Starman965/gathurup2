@@ -370,7 +370,8 @@ function getEventDetailsData() {
         attire: document.getElementById('eventAttire').value,
         attireComments: document.getElementById('eventAttireComments').value.trim() || null,
         food: document.getElementById('eventFood').value.trim(),
-        additionalComments: document.getElementById('eventAdditionalComments').value.trim() || null
+        additionalComments: document.getElementById('eventAdditionalComments').value.trim() || null,
+        includeRsvpSection: document.getElementById('includeRsvpSection').checked
     };
 }
 
@@ -408,6 +409,7 @@ function setEventDetailsData(details) {
     document.getElementById('eventAttireComments').value = details.attireComments || '';
     document.getElementById('eventFood').value = details.food || '';
     document.getElementById('eventAdditionalComments').value = details.additionalComments || '';
+    document.getElementById('includeRsvpSection').checked = details.includeRsvpSection || false; 
 }
 function validateEventPageSettings() {
     const includeEventDetails = document.getElementById('includeEventDetails').checked;
@@ -460,6 +462,7 @@ async function createEvent(e) {
         includeEventDetails: document.getElementById('includeEventDetails').checked,
         includeDatePreferences: document.getElementById('includeDatePreferences').checked,
         includeLocationPreferences: document.getElementById('includeLocationPreferences').checked, 
+        includeRsvpSection: document.getElementById('includeRsvpSection').checked, // Add this line
         
          dates: selectedDates.map(dateRange => {
             if (dateRange.type === 'dayOfWeek') {

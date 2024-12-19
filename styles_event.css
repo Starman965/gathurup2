@@ -998,3 +998,45 @@ body {
         height: 20px;
     }
 }
+/* RSVP Card */
+#rsvpCard {
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+#rsvpCard h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 1.5rem 0;
+}
+
+#rsvpCard .form-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+#rsvpCard .form-group label {
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+#rsvpCard .form-group select {
+    width: 50%; /* Adjust the width as needed */
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+#addToCalendarContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}

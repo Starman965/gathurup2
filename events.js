@@ -576,22 +576,34 @@ window.toggleVote = function(date, time) {
             updatedVotes[key] = value === 'maybe' ? 'no' : value;
         }
     
-        try {
-            const votesRef = ref(database, `users/${userId}/events/${eventId}/votes/${selectedFullName}`);
-            await set(votesRef, {
-                datePreferences: updatedVotes,
-                locationPreferences: locationVotes
-            });
-            // alert('Preferences submitted successfully.');  commented out to prevent alert
-            // Redirect to confirmation.html with query parameters
-            window.location.href = `confirmation.html?event=${eventId}&user=${userId}&name=${name}`;
-        } catch (error) {
-            console.error('Error submitting preferences:', error);
-            alert('Error submitting preferences.');
-        }
+           // Get RSVP status
+    const rsvpStatus = document.getElementById('rsvpStatus').value;
+
+    try {
+        const votesRef = ref(database, `users/${userId}/events/${eventId}/votes/${selectedFullName}`);
+        await set(votesRef, {
+            datePreferences: updatedVotes,
+            locationPreferences: locationVotes
+        });
+
+        // Store RSVP status
+        const rsvpRef = ref(database, `users/${userId}/events/${eventId}/rsvps/${selectedFullName}`);
+        await set(rsvpRef, {
+            name: selectedFullName,
+            status: rsvpStatus
+        });
+
+        // Redirect to confirmation.html with query parameters
+        window.location.href = `confirmation.html?event=${eventId}&user=${userId}&name=${name}`;
+    } catch (error) {
+        console.error('Error submitting preferences:', error);
+        alert('Error submitting preferences.');
     }
-    
-    document.getElementById('submitButton').addEventListener('click', submitPreferences);
+}
+
+document.getElementById('submitButton').addEventListener('click', submitPreferences);
+
+
 // Initialize the page
 document.addEventListener('DOMContentLoaded', async () => {
     await initializeEventTimezone();
@@ -791,7 +803,9 @@ window.toggleMonth = function(month) {
 window.confirmName = async function() {
     const nameSelect = document.getElementById('nameSelect');
     selectedFullName = nameSelect.options[nameSelect.selectedIndex].text;
-    if (selectedFullName) {
+    console.log('Selected name:', selectedFullName); // Debug log
+
+    if (selectedFullName && selectedFullName !== 'Choose your name...') {
         document.getElementById('nameCaptureModal').style.display = 'none';
         await loadUserVotes();
         await loadEventData(); // Reload event data with selected name
@@ -891,16 +905,58 @@ function formatTimeString(timeStr) {
     const hour12 = hour % 12 || 12;
     return `${hour12}:${minutes} ${period}`;
 }
+async function populateRsvpStatus(eventData) {
+    console.log('Populating RSVP status for:', selectedFullName); // Debug log
 
-function populateEventDetails(eventData) {
+    if (!selectedFullName || selectedFullName === 'Choose your name...') {
+        console.log('No valid name selected yet');
+        return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const eventId = urlParams.get('event');
+    const userId = urlParams.get('user');
+
+    try {
+        console.log('Fetching RSVP status from path:', `users/${userId}/events/${eventId}/rsvps/${selectedFullName}`); // Debug log
+        const rsvpRef = ref(database, `users/${userId}/events/${eventId}/rsvps/${selectedFullName}`);
+        const rsvpSnap = await get(rsvpRef);
+        const rsvpData = rsvpSnap.val();
+
+        console.log('RSVP Data:', rsvpData); // Debug log
+
+        if (rsvpData && rsvpData.status) {
+            const rsvpStatus = rsvpData.status;
+            const rsvpSelect = document.getElementById('rsvpStatus');
+            if (rsvpSelect) {
+                rsvpSelect.value = rsvpStatus;
+                console.log('Set RSVP status to:', rsvpStatus); // Debug log
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching RSVP status:', error);
+    }
+}
+async function populateEventDetails(eventData) {
     currentEventData = eventData;
+    const rsvpCard = document.getElementById('rsvpCard');
     const eventDetailsCard = document.getElementById('eventDetailsCard');
+    
     if (!eventData.includeEventDetails || !eventData.eventDetails) {
         eventDetailsCard.style.display = 'none';
+        rsvpCard.style.display = 'none';
         return;
     }
 
     eventDetailsCard.style.display = 'block';
+
+    // Show RSVP card if includeRsvpSection is true
+    if (eventData.includeRsvpSection) {
+        rsvpCard.style.display = 'block';
+        await populateRsvpStatus(eventData); // Ensure this line is correct
+    } else {
+        rsvpCard.style.display = 'none';
+    }
 
     // Get timezone once for all uses
     const timezone = eventData.eventDetails.timeZone || currentTimezone || 'America/Los_Angeles';
@@ -1057,6 +1113,7 @@ function populateEventDetails(eventData) {
         `;
     }
 }
+
 // Add this new function
 function updateEventDetailsWithTimezone(timezone) {
     if (!eventData || !eventData.eventDetails) return;
